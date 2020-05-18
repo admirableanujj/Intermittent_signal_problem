@@ -134,7 +134,7 @@ class neural_net_based_EKF:
             C = np.identity(9)
             R = self.R
             I = np.identity(9)
-            # print(f'signal: {signal}')
+            print(f'signal: {signal}')
             if signal:
                 x_hat = self.state_estimate(dt,glb)
                 self.Y = np.array([[measure[0]], [measure[1]], [measure[2]], [measure[3]], [measure[4]], [measure[5]], [measure[6]], [measure[7]], [measure[8]]])
@@ -149,7 +149,10 @@ class neural_net_based_EKF:
                 # foo = (np.transpose(x_hat) + np.dot(L,(self.Y - np.dot(C, x_hat))))
                 foo = (x_hat + np.dot(L,(self.Y - np.dot(C,x_hat))))
                 self.Pk = np.dot((I - np.dot(L,C)),Pk)
-
+            if np.shape(x_hat) ==(9,1):
+                pass
+            else:
+                x_hat = np.reshape(x_hat,(len(x_hat),1))
 
             loss_val = nn_model.neural_net_update(torch.from_numpy(ymea_nn), torch.from_numpy(x_hat), dt)
             # print(foo )
