@@ -1,0 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+For the one who always beilieved in me Ankiit Saxena
+author: Anujj Saxena
+email: saxenaaj@mail.uc.edu
+Please feel free to use and modify this, but keep the above information. Thanks!
+"""
+################################################################
+Things that can be done if time permits:
+1. Rewirte plot_graph in a better way. (fig, axs = plt.subplots(2, 1, constrained_layout=True))
+################################################################
