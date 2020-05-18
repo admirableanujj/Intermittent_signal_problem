@@ -112,7 +112,7 @@ def main():
 
         sim_data = {}
         # ['no_noise', 'noise', 'ekf', 'neural_nets']
-        for sim in ['no_noise', 'noise', 'ekf']:
+        for sim in ['no_noise', 'noise', 'ekf', 'neural_nets']:
             ekf = extended_Kalman_Filter()
             nn_ekf = nn_EKF()
             logging.info(f'{sim}')
@@ -137,11 +137,11 @@ def main():
             quad = Quadcopter() 
             imu = Sensor()
             step_number = 0         
-            s_intv = 1*factor
-            e_intv = 3*factor
+            s_intv = 1.5*factor
+            e_intv = 3.5*factor
             glb.waypoints = waypoints
             ###############################
-            for t in range(1, t_sim*factor, int(params.dt*factor)):
+            for t in range(0, t_sim*factor, int(params.dt*factor)):
                 waypoint_desired = waypoints[i][0:3]
                 # if sim == 'ekf':
                 #     print(abs(glb.error_x) + abs(glb.error_y) + abs(glb.error_z))
@@ -266,7 +266,7 @@ def main():
                             s_intv += 3*factor
                             e_intv += 3*factor
                         if sim == 'neural_nets':
-                            nn_ekf_states, _ , loss_val = nn_ekf.cal_kalman_gain(dt, nn_obj, x_new, gps_nn, np.array(gps), False, glb)
+                            nn_ekf_states, _ , loss_val = nn_ekf.cal_kalman_gain(dt, nn_obj, ann_input, gps_nn, np.array(gps), False, glb)
 
                     else:
                         # print(time_intv)
@@ -276,7 +276,7 @@ def main():
                         # fields = ['px', 'py', 'pz', 'dpx', 'dpy', 'dpz', 'phi', 'theta', 'psi', 'ax', 'ay', 'az', 'w1', 'w2', 'w3','w4']
                         ekf_states, _ = ekf.cal_kalman_gain(dt, gps, glb)
                         if sim == 'neural_nets':
-                            nn_ekf_states, _ , loss_val = nn_ekf.cal_kalman_gain(dt, nn_obj, x_new, gps_nn, np.array(gps), True, glb)
+                            nn_ekf_states, _ , loss_val = nn_ekf.cal_kalman_gain(dt, nn_obj, ann_input, gps_nn, np.array(gps), True, glb)
                         # print(sid)
                         # # print(states)
                     if ekf_states.ndim > 1 :
@@ -373,7 +373,7 @@ def main():
                 # ---------------for Neural net
                 row = [pos[0], pos[1], pos[2], vel[0], vel[1], vel[2], phi, theta, psi, acc[0][0], acc[1][0], acc[2][0], w1, w2, w3, w4]
                 # row = [pos[0], pos[1], pos[2], vel[0], vel[1], vel[2], phi, theta, psi, w1, w2, w3, w4]
-                x_new = np.array(row)
+                ann_input = np.array(row)
                 # ---------------for Neural net
                 # fields = ['px', 'py', 'pz', 'dpx', 'dpy', 'dpz', 'phi', 'theta', 'psi', 'ax', 'ay', 'az', 'w1', 'w2', 'w3','w4']
                 glb.rows.insert(index, row)

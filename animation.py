@@ -131,5 +131,5 @@ def sameAxisAnimation(data, glb):
     line_ani = animation.FuncAnimation(fig, updateLines, init_func=ini_plot, frames=len(t_all[0:-2:numFrames]), interval=(Ts*100*numFrames), blit=False)        
 
     if True:
-        line_ani.save('C:\\Users\\anujj\\OneDrive - University of Cincinnati\\Thesis\\Figure\\animation\\animation_noise2.gif', writer='imagemagick', fps=60)
+        line_ani.save('C:\\Users\\anujj\\OneDrive - University of Cincinnati\\Thesis\\Figure\\animation2\\animation_noise2.gif', writer='imagemagick', fps=60)
     return line_ani

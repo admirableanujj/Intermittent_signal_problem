@@ -46,10 +46,10 @@ class Plot_graph:
             print(f"ekf_Error:{e}")
         try:
             neural = sim_data['neural_nets']
-            # self.graph_for_position_error(neural, glb)
-            # self.graph_for_attitude_related_error(neural, glb)
-            # self.graph_for_position_values(neural, glb)
-            # self.graph_for_angular_speed_motor(neural, glb)
+            self.graph_for_position_error(neural, glb)
+            self.graph_for_attitude_related_error(neural, glb)
+            self.graph_for_position_values(neural, glb)
+            self.graph_for_angular_speed_motor(neural, glb)
         except:
             e = sys.exc_info()
             print(f"Nuera_nets: {e}")
@@ -57,19 +57,19 @@ class Plot_graph:
             # self.sig_acc_array(no_noise)
             # self.duo_graphs3d_pos(ekf, no_noise)
             # self.sig_graphs3d_pos(no_noise)
-            self.sig_graphs3d_pos(no_noise)
+            # self.sig_graphs3d_pos(no_noise)
             # self.plot_acc_array(no_noise, noise, ekf, neural, ekf_flag)
             # self.plot_graphs3d(no_noise, noise, ekf, ekf_flag)
             # self.plot_graphs3d_nu(no_noise, noise, ekf, neural, ekf_flag)
             # self.plot_graphs3d_pos(no_noise, noise, ekf, neural, ekf_flag)
-            # self.sig_graphs3d_pos2(ekf, no_noise)
+            self.sig_graphs3d_pos2(ekf, no_noise)
             # self.sig_graphs3d_pos2(neural, no_noise)
 
         except:
             e = sys.exc_info()
             # self.plot_acc_array(no_noise, noise, no_noise,ekf_flag)
             print(f'No z axis graph for you.: {e}')
-        # ani =  animation.sameAxisAnimation(noise, glb)        
+        ani =  animation.sameAxisAnimation(ekf, glb)        
         plt.show()   
     
 

@@ -18,6 +18,7 @@ from global_vars import global_vars
 import params
 import logging
 import torch
+import sys
 
 class neural_net_based_EKF:
     
@@ -56,6 +57,7 @@ class neural_net_based_EKF:
         r = state[8]
         # x_hat = px_hat, py_hat, pz_hat, phi_hat, theta_hat, psi_hat
         x_hat = self.x_hat
+        # print(x_hat)
         az = -1*state[15]/params.m
         # print(az)        
         
@@ -74,6 +76,7 @@ class neural_net_based_EKF:
         x_hat = x_hat + DynamicsDot*dt
         # print('self.x_hat: ',np.shape(self.x_hat))
         # print('x_hat: ',np.shape(x_hat))
+        
         return x_hat
 
     #----------------------------------------------------------------
@@ -119,7 +122,7 @@ class neural_net_based_EKF:
     #----------------------------------------------------------------
     # Kalman Gain
     # ---------------------------------------------------------------
-    def cal_kalman_gain(self, dt, nn_model, x_new, measure, ymea_nn, signal, glb):
+    def cal_kalman_gain(self, dt, nn_model, ann_input, measure, ymea_nn, signal, glb):
         # print('pos: ', quad.pos)
             # x_hat = self.state_estimate(dt,glb)
             # x_hat = nn_model.neural_net_predict(x_new)
@@ -131,22 +134,26 @@ class neural_net_based_EKF:
             C = np.identity(9)
             R = self.R
             I = np.identity(9)
+            # print(f'signal: {signal}')
             if signal:
-                # x_hat = self.state_estimate(dt,glb)
                 x_hat = self.state_estimate(dt,glb)
                 self.Y = np.array([[measure[0]], [measure[1]], [measure[2]], [measure[3]], [measure[4]], [measure[5]], [measure[6]], [measure[7]], [measure[8]]])
                 L = np.nan_to_num(np.dot(np.dot(Pk,C.transpose()),np.linalg.inv(R + np.dot(np.dot(C,Pk),C.transpose()))))  #kalman_gain
                 foo = (x_hat + np.dot(L,(self.Y - np.dot(C,x_hat))))
+                # foo  = (x_hat + np.dot(L, np.transpose(self.Y - np.transpose(np.dot(C,x_hat))))) #same as EKF
                 self.Pk = np.dot((I - np.dot(L,C)),Pk)
             else:
-                x_hat = nn_model.neural_net_predict(x_new)
+                x_hat = nn_model.neural_net_predict(ann_input).detach().numpy()
+                x_hat = np.reshape(x_hat,(len(x_hat),1))
                 L = np.nan_to_num(np.dot(np.dot(Pk,C.transpose()),np.linalg.inv(R + np.dot(np.dot(C,Pk),C.transpose()))))  #kalman_gain
-                foo = (np.transpose(x_hat.detach().numpy()) + np.dot(L,(self.Y - np.dot(C, x_hat.detach().numpy()))))
+                # foo = (np.transpose(x_hat) + np.dot(L,(self.Y - np.dot(C, x_hat))))
+                foo = (x_hat + np.dot(L,(self.Y - np.dot(C,x_hat))))
                 self.Pk = np.dot((I - np.dot(L,C)),Pk)
-            if not torch.is_tensor(x_hat):
-                x_hat = torch.from_numpy(x_hat)
-            loss_val = nn_model.neural_net_update(torch.from_numpy(ymea_nn), x_hat, dt)
-            self.x_hat = foo            
+
+
+            loss_val = nn_model.neural_net_update(torch.from_numpy(ymea_nn), torch.from_numpy(x_hat), dt)
+            # print(foo )
+            self.x_hat = foo
             glb.kalman_gain_array.append(L)
             return np.transpose(foo), self.Pk, loss_val
     # ---------------------------------------------------------------
@@ -160,3 +167,26 @@ class neural_net_based_EKF:
             #     L = np.nan_to_num(np.dot(np.dot(Pk,C.transpose()),np.linalg.inv(R + np.dot(np.dot(C,Pk),C.transpose()))))  #kalman_gain
             #     foo = (x_hat + np.dot(L,(self.Y - np.dot(C,x_hat))))
             #     self.Pk = np.dot((I - np.dot(L,C)),Pk)
+            #--------------------------------------------------------------
+            # if not torch.is_tensor(x_hat):
+            #     # print(np.shape(x_hat))
+            #     if np.shape(x_hat) == (9,1):
+            #         pass
+            #     else:
+            #         sys.exit()
+            #         print(f'found {np.shape(x_hat)} in else')
+            #         bar2 = [0,0,0,0,0,0,0,0,0]
+            #         for i in range(0,len(x_hat-1)):
+            #             # print(x_hat[i][0])
+            #             bar2[i] = x_hat[i][0]
+            #         x_hat = np.array(bar2)
+            # ------------------------------------------------------------------
+            # if np.shape(foo) == (9,1):
+            #         print(foo)
+            # else:
+            #         print(foo)
+            #         foo = np.reshape(foo,(len(foo),1))                    
+            #         print(f'found {np.shape(foo)} in foo')
+            #         sys.exit()
+
+
