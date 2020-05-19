@@ -147,7 +147,7 @@ class extended_Kalman_Filter:
             # print(np.dot(np.dot(C,Pk),C.transpose()))
 
             # print(L)
-            logging.info(f'L:{L}')
+            # logging.info(f'L:{L}')
 
             # print(self.Pk)
 

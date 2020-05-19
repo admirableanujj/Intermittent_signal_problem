@@ -86,7 +86,6 @@ class Position_Control:
         # % Notice here that acceleration/Force is the control input for finally 
         # %conmtrolling position. So there is a good chance that a PD Controller 
         # % will work.
-
         # % Position Control. Deciding acceleration to be given position based on position error 
         acc_dec = acc_final_desired +  Kp*error + Kd*error_vel
         ######################Class Variable

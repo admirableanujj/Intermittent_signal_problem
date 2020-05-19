@@ -135,9 +135,9 @@ class Sensor:
             self.phi_theta_psi_array = global_vars.file_read('phi_theta_psi_array')
             glb.first_time_file_read = False
         temp_pos = self.pos_data[step_number]
-        temp_pos[0] = temp_pos[0] + gauss(0,2.5)
-        temp_pos[1] = temp_pos[1] + gauss(0,2.5)
-        temp_pos[2] = temp_pos[2] + gauss(0,2.5)
+        # temp_pos[0] = temp_pos[0] + gauss(0,2.5)
+        # temp_pos[1] = temp_pos[1] + gauss(0,2.5)
+        # temp_pos[2] = temp_pos[2] + gauss(0,2.5)
         # print(temp_pos)
         temp_vel = self.vel_array[step_number]
         temp_phi_theta_psi = self.phi_theta_psi_array[step_number]

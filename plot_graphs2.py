@@ -70,7 +70,7 @@ class Plot_graph:
             # self.plot_acc_array(no_noise, noise, no_noise,ekf_flag)
             print(f'No z axis graph for you.: {e}')
         self.graph_for_position_values2(no_noise, {'ekf':ekf})
-        self.graph_for_position_values2(no_noise, {'neural':neural})
+        # self.graph_for_position_values2(no_noise, {'neural':neural})
         # ani =  animation.sameAxisAnimation(noise, glb)        
         # plt.show()   
     

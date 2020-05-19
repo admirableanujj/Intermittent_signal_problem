@@ -97,7 +97,7 @@ def main():
         # waypoints = np.array([[3, 6,  -1],
         #                       [17*8, 25*6, 34*4], 
         #                       [-60, 20, 60]])
-        waypoints = np.array([
+        waypoints = np.array([[-60, 20, 60],
                               [17*4, 25*3, 34*1], 
                               [-60, 20, 60]])
 

@@ -134,7 +134,7 @@ class neural_net_based_EKF:
             C = np.identity(9)
             R = self.R
             I = np.identity(9)
-            print(f'signal: {signal}')
+            # print(f'signal: {signal}')
             if signal:
                 x_hat = self.state_estimate(dt,glb)
                 self.Y = np.array([[measure[0]], [measure[1]], [measure[2]], [measure[3]], [measure[4]], [measure[5]], [measure[6]], [measure[7]], [measure[8]]])
