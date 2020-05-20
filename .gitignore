@@ -1,5 +1,6 @@
 temp
 BKPs
 train_data.csv
-__pycache__
+__pycache__*
 logger.log
+.vscode

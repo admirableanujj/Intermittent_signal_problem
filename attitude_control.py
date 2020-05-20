@@ -20,9 +20,14 @@ class Attitude_control:
         q = p_q_r[1]
         r = p_q_r[2]
 
+        # phi_des   = self.angle_saturation(angles_desired[0]) 
+        # theta_des = self.angle_saturation(angles_desired[1]) 
+        # psi_des   = self.angle_saturation(angles_desired[2])
         phi_des   = angles_desired[0] 
         theta_des = angles_desired[1] 
         psi_des   = angles_desired[2]
+
+
 
         ##########################################
         glb.gps[6] = angles_desired[0]
@@ -91,3 +96,10 @@ class Attitude_control:
         glb.angular_vel_required_array.append(angular_vel_required)
 
         return w_des
+
+    # def angle_saturation(self, angle):
+    #     if angle >= 0.2:
+    #         angle = 0.2
+    #     elif angle <= -0.2:
+    #         angle = -0.2
+    #     return angle

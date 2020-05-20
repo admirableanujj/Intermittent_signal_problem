@@ -30,6 +30,14 @@ def motor_saturation(w):
              w = 30
         return w
 
+def angle_saturation(angle):
+    if angle >= 0.2:
+            angle = 0.2
+    elif angle <= -0.2:
+            angle = -0.2
+    return angle
+
+
 
 def file_write_csv(file_name, rows, fields):
     with open(file_name, 'w') as csvfile:  
@@ -97,13 +105,16 @@ def main():
         # waypoints = np.array([[3, 6,  -1],
         #                       [17*8, 25*6, 34*4], 
         #                       [-60, 20, 60]])
-        waypoints = np.array([[-60, 20, 60],
-                              [17*4, 25*3, 34*1], 
-                              [-60, 20, 60]])
+        # waypoints = np.array([
+        #                       [17*4, 25*3, 34*1], 
+        #                       [-60, 20, 60]])         #waypoint in cm
+        waypoints = np.array([
+                              [10, 10, 10], 
+                              [10, 10, 10]])
 
         # % waypoints = [-12  45 -19];
         # t_sim  = 80
-        t_sim  = 80
+        t_sim  = 25
         factor = 100
         target_waypoint = 0
 
@@ -112,7 +123,7 @@ def main():
 
         sim_data = {}
         # ['no_noise', 'noise', 'ekf', 'neural_nets']
-        for sim in ['no_noise', 'noise', 'ekf', 'neural_nets']:
+        for sim in ['no_noise','noise', 'ekf']:
             ekf = extended_Kalman_Filter()
             nn_ekf = nn_EKF()
             logging.info(f'{sim}')
@@ -137,17 +148,20 @@ def main():
             quad = Quadcopter() 
             imu = Sensor()
             step_number = 0         
-            s_intv = 1.5*factor
-            e_intv = 3.5*factor
+            s_intv = 5
+            e_intv = 3
             glb.waypoints = waypoints
             ###############################
             for t in range(0, t_sim*factor, int(params.dt*factor)):
+                # print(t)
                 waypoint_desired = waypoints[i][0:3]
                 # if sim == 'ekf':
                 #     print(abs(glb.error_x) + abs(glb.error_y) + abs(glb.error_z))
                 # print(waypoint_desired)
                 if(abs(glb.error_x) + abs(glb.error_y) + abs(glb.error_z)) < 0.3:
                     count = count + 1
+                    # print(abs(glb.error_x) + abs(glb.error_y) + abs(glb.error_z))
+                    # print(waypoint_desired)
                     if count > 400*params.dt*factor:
                         i = i + 1
                         # print(sim)
@@ -169,7 +183,7 @@ def main():
                 r_des = 0       
                 phi_theta_psi  = [phi, theta, psi]
                 p_q_r          = [p, q, r]
-                angles_desired = [phi_des, theta_des, psi_des]
+                angles_desired = [angle_saturation(phi_des), angle_saturation(theta_des), angle_saturation(psi_des)]
                 angular_vel_required = [p_des, q_des, r_des]
                 # print('phi_theta_psi: ', phi_theta_psi, 'p_q_r: ', p_q_r)
                 # %  ==============   Attitude Control Loop   ============ %
@@ -189,6 +203,7 @@ def main():
                 # if sim == 'noise':                
                     acc, pos, vel, phi_theta_psi, pqr = quad.quad_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, True, glb)
                     imu.acc, imu.pos, imu.uvw, imu.phi_theta_psi, imu.pqr = imu.imu_model_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, True, glb)
+                    # print(f'pos: {pos} ,imu:{imu.pos}')
                 else:
                     acc, pos, vel, phi_theta_psi, pqr = quad.quad_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)
                     imu.acc, imu.pos, imu.uvw, imu.phi_theta_psi, imu.pqr = imu.imu_model_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)
@@ -222,6 +237,10 @@ def main():
                 ######################
                 if sim == 'noise'or sim == 'ekf':
                 # if sim == 'noise' or 'ekf':
+                    temp_pos = pos
+                    temp_vel = vel
+                    temp_phi_theta_psi = phi_theta_psi
+
                     pos[0] =   imu.pos[0]
                     pos[1] =   imu.pos[1]
                     pos[2] =   imu.pos[2]
@@ -237,7 +256,9 @@ def main():
                 # Implementing Kalman filter.
                 ######################
                 if sim == 'ekf' or sim == 'neural_nets':
-                    temp_pos, temp_vel, temp_phi_theta_psi = imu.gps_module(glb.first_time_file_read, step_number, glb)
+                    # temp_pos, temp_vel, temp_phi_theta_psi = imu.gps_module(glb.first_time_file_read, step_number, glb)
+                    temp_pos, temp_vel, temp_phi_theta_psi = imu.gps_module(temp_pos, temp_vel, temp_phi_theta_psi)
+                    # print(f'pos: {pos}, temp_pos: {temp_pos}, t:{t} ')
 
                     ekf_flag = True
                     glb.state[0] = imu.uvw[0]  
@@ -255,16 +276,17 @@ def main():
                     # if t in range(int(1*factor), int (3*factor)) or t in range(int(4*factor), int(7*factor)) or t in range(int(8*factor), int(11*factor)) or t != 0:
                     # if t in range(int(1*factor), int(t_sim*factor), 3*factor) :
                     if t in time_intv:
+                        # print(time_intv)
                         # print(f's_intv:{s_intv},e_intv:{e_intv},t:{t}')
                         # gps = [glb.gps[0], glb.gps[1], glb.gps[2], glb.gps[3], glb.gps[4], glb.gps[5], glb.gps[6], glb.gps[7], glb.gps[8]]
                         # gps = [temp_pos[0], temp_pos[1], temp_pos[2], temp_vel[0], temp_vel[1], temp_vel[2], temp_phi_theta_psi[0], temp_phi_theta_psi[1], temp_phi_theta_psi[2]]
                         # gps = [0, 0, 0, temp_vel[0], temp_vel[1], temp_vel[2], temp_phi_theta_psi[0], temp_phi_theta_psi[1], temp_phi_theta_psi[2]]
                         gps_nn = [imu.pos[0], imu.pos[1], imu.pos[2], imu.uvw[0], imu.uvw[1], imu.uvw[2], imu.phi_theta_psi[0], imu.phi_theta_psi[1], imu.phi_theta_psi[2]]
-                        ekf_states, _ = ekf.cal_kalman_gain(dt, [], glb)
+                        ekf_states, _ = ekf.cal_kalman_gain(dt, [], t, glb)
                         # Signal after every 3 sec
                         if t > e_intv-2:
-                            s_intv += 3*factor
-                            e_intv += 3*factor
+                            s_intv = e_intv + 5
+                            e_intv = s_intv + 3
                         if sim == 'neural_nets':
                             nn_ekf_states, _ , loss_val = nn_ekf.cal_kalman_gain(dt, nn_obj, ann_input, gps_nn, np.array(gps), False, glb)
 
@@ -274,11 +296,14 @@ def main():
                         # gps = [0, 0, 0, 0, 0, 0, 0, 0, 0]
                         gps_nn = [imu.pos[0], imu.pos[1], imu.pos[2], imu.uvw[0], imu.uvw[1], imu.uvw[2], imu.phi_theta_psi[0], imu.phi_theta_psi[1], imu.phi_theta_psi[2]]
                         # fields = ['px', 'py', 'pz', 'dpx', 'dpy', 'dpz', 'phi', 'theta', 'psi', 'ax', 'ay', 'az', 'w1', 'w2', 'w3','w4']
-                        ekf_states, _ = ekf.cal_kalman_gain(dt, gps, glb)
+                        ekf_states, _ = ekf.cal_kalman_gain(dt, gps, t, glb)
                         if sim == 'neural_nets':
                             nn_ekf_states, _ , loss_val = nn_ekf.cal_kalman_gain(dt, nn_obj, ann_input, gps_nn, np.array(gps), True, glb)
                         # print(sid)
                         # # print(states)
+                        # print(ekf_states)
+                        print(f'pos: {pos}, ekf_states: {ekf_states[0][0:3]}, t:{t}')
+
                     if ekf_states.ndim > 1 :
                         ekf_states = ekf_states[0]
                     glb.state_ekf[0]  =  ekf_states[0]
@@ -300,15 +325,15 @@ def main():
                         # glb.state[10] = vel[1]     
                         # glb.state[11] = vel[2] 
                         # --------------------------
-                    pos[0] =   glb.state_ekf[0]
-                    pos[1] =   glb.state_ekf[1]
-                    pos[2] =   glb.state_ekf[2]
-                    phi    =   glb.state_ekf[6]
-                    theta  =   glb.state_ekf[7]
-                    psi    =   glb.state_ekf[8]
-                    vel[0] =   glb.state_ekf[3]
-                    vel[1] =   glb.state_ekf[4]
-                    vel[2] =   glb.state_ekf[5]
+                    # pos[0] =   glb.state_ekf[0]
+                    # pos[1] =   glb.state_ekf[1]
+                    # pos[2] =   glb.state_ekf[2]
+                    # phi    =   glb.state_ekf[6]
+                    # theta  =   glb.state_ekf[7]
+                    # psi    =   glb.state_ekf[8]
+                    # vel[0] =   glb.state_ekf[3]
+                    # vel[1] =   glb.state_ekf[4]
+                    # vel[2] =   glb.state_ekf[5]
                     # print(glb.state_ekf)
                     # --------------------------
                 else:
@@ -427,7 +452,7 @@ def main():
                 file_write_csv(file_name, rows, fields)
                 fields, neu_rows = file_read_csv(file_name)
                 x_in, y_in = nn.data_in_prrocessor(neu_rows)
-                nn_obj = nn(x_in, y_in)  #Creates nueral net object with Training
+                nn_obj = nn(x_in, y_in, False)  #Creates nueral net object with Training
                 count = 0
                 y_in_array = []
                 y_pred_array = []

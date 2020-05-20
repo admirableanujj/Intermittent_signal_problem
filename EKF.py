@@ -20,18 +20,28 @@ import logging
 class extended_Kalman_Filter:
     
     def  __init__(self):
-        self.Q = np.identity(9)*0.001
+        self.Q = np.identity(9)*1
         self.x_hat = np.array([[0], [0], [0], [0], [0], [0], [0], [0], [0]])
         self.P = np.identity(9)
-        self.R = np.array([[1.5, 0, 0, 0, 0, 0, 0, 0, 0],
-                            [0, 1.5, 0, 0, 0, 0, 0, 0, 0],
-                            [0, 0, 1.5, 0, 0, 0, 0, 0, 0],
-                            [0, 0, 0, 1, 0, 0, 0, 0, 0],
-                            [0, 0, 0, 0, 1, 0, 0, 0, 0],
-                            [0, 0, 0, 0, 0, 1, 0, 0, 0],
-                            [0, 0, 0, 0, 0, 0, 1, 0, 0],
-                            [0, 0, 0, 0, 0, 0, 0, 1, 0],
-                            [0, 0, 0, 0, 0, 0, 0, 0, 1]])
+        self.R = np.array([[1, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 1, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 1, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0, 0]])
+        self.Pk = np.identity(9)
+        self.C = np.array([[1, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 1, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 1, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0, 0]])
       
     
 
@@ -119,28 +129,42 @@ class extended_Kalman_Filter:
     #----------------------------------------------------------------
     # Kalman Gain
     # ---------------------------------------------------------------
-    def cal_kalman_gain(self, dt, measure, glb):
+    def cal_kalman_gain(self, dt, measure, t, glb):
         # print('pos: ', quad.pos)
-            x_hat = self.state_estimate(dt,glb)
         # print('XXHat-shape:  ', x_hat)
-            Pk = self.covariance_estimate(dt,glb)
+            # Pk = self.covariance_estimate(dt,glb)
         # print('Pk: ', Pk)
-
+            if t < 10:
+                self.x_hat = self.state_estimate(dt,glb)
+                self.Pk = self.covariance_estimate(dt,glb)
         # try:
-            C = np.identity(9)
-            # R = np.identity(9)*1.5
+            # C = np.identity(9)
+            C = self.C
+            # R = np.identity(9)*0.05
             R = self.R 
             I = np.identity(9)
             if measure:
+                x_hat = self.x_hat
+                Pk = self.Pk
                 self.Y = np.array([[measure[0]], [measure[1]], [measure[2]], [measure[3]], [measure[4]], [measure[5]], [measure[6]], [measure[7]], [measure[8]]])
-                L = np.nan_to_num(np.dot(np.dot(Pk,C.transpose()),np.linalg.inv(R + np.dot(np.dot(C,Pk),C.transpose()))))  #kalman_gain
-                foo = (x_hat + np.dot(L,(self.Y - np.dot(C,x_hat))))
+                # print(R + np.dot(np.dot(C,Pk),C.transpose()))
+                # L = np.nan_to_num(np.dot(np.dot(Pk,C.transpose()),np.linalg.inv(R + np.dot(np.dot(C,Pk),C.transpose()))))  #kalman_gain
+                L = np.nan_to_num(np.dot(np.dot(Pk,C.transpose()),np.linalg.pinv(R + np.dot(np.dot(C,Pk),C.transpose()))))  #kalman_gain
                 self.Pk = np.dot((I - np.dot(L,C)),Pk)
+                foo = (x_hat + np.dot(L,(self.Y - np.dot(C,x_hat))))
+                # print(L)
+                
             else:
-                L = np.nan_to_num(np.dot(np.dot(Pk,C.transpose()),np.linalg.inv(R + np.dot(np.dot(C,Pk),C.transpose()))))  #kalman_gain
+                N = 10
+                for i in range(0,N):
+                    x_hat = self.state_estimate(dt/N,glb)
+                    Pk = self.covariance_estimate(dt/N,glb)
+                    self.x_hat =  x_hat
+                    self.Pk = Pk
+                # L = np.nan_to_num(np.dot(np.dot(Pk,C.transpose()),np.linalg.inv(R + np.dot(np.dot(C,Pk),C.transpose()))))  #kalman_gain
                 # foo = (x_hat + np.dot(L,(self.Y - np.dot(C,x_hat))))
                 foo = x_hat
-                self.Pk = np.dot((I - np.dot(L,C)),Pk)
+                # self.Pk = np.dot((I - np.dot(L,C)),Pk)
 
             # print(L)
 
@@ -148,7 +172,7 @@ class extended_Kalman_Filter:
 
             # print(L)
             # logging.info(f'L:{L}')
-
+            # logging.info(f'Foo: {foo}')
             # print(self.Pk)
 
             # print(foo)

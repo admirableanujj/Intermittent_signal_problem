@@ -149,15 +149,18 @@ class neural_net_based_EKF:
                 # foo = (np.transpose(x_hat) + np.dot(L,(self.Y - np.dot(C, x_hat))))
                 foo = (x_hat + np.dot(L,(self.Y - np.dot(C,x_hat))))
                 self.Pk = np.dot((I - np.dot(L,C)),Pk)
-            if np.shape(x_hat) ==(9,1):
-                pass
+            # print(foo)
+            if np.shape(x_hat) ==(9,1) and np.shape(ymea_nn) ==(9,1):
+                x_hat = np.reshape(x_hat,(len(x_hat),1))
             else:
                 x_hat = np.reshape(x_hat,(len(x_hat),1))
+                ymea_nn = np.reshape(ymea_nn,(len(ymea_nn),1))
 
             loss_val = nn_model.neural_net_update(torch.from_numpy(ymea_nn), torch.from_numpy(x_hat), dt)
             # print(foo )
             self.x_hat = foo
             glb.kalman_gain_array.append(L)
+            # return np.transpose(foo), self.Pk, loss_val
             return np.transpose(foo), self.Pk, loss_val
     # ---------------------------------------------------------------
 

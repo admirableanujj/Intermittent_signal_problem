@@ -37,33 +37,17 @@ class Plot_graph:
         try:
             if ekf_flag:
                 ekf = sim_data['ekf']
-                # self.graph_for_position_error( ekf, glb)
-                # self.graph_for_attitude_related_error(ekf, glb)
-                # self.graph_for_position_values(ekf, glb)
-                # self.graph_for_angular_speed_motor(ekf, glb)
         except:
             e = sys.exc_info()
             print(f"ekf_Error:{e}")
         try:
             neural = sim_data['neural_nets']
-            # self.graph_for_position_error(neural, glb)
-            # self.graph_for_attitude_related_error(neural, glb)
-            # self.graph_for_position_values(neural, glb)
-            # self.graph_for_angular_speed_motor(neural, glb)
         except:
             e = sys.exc_info()
             print(f"Nuera_nets: {e}")
         try:
             pass
-            # self.sig_acc_array(no_noise)
-            # self.duo_graphs3d_pos(ekf, no_noise)
-            # self.sig_graphs3d_pos(no_noise)
-            # self.sig_graphs3d_pos(no_noise)
-            # self.plot_acc_array(no_noise, noise, ekf, neural, ekf_flag)
-            # self.plot_graphs3d(no_noise, noise, ekf, ekf_flag)
-            # self.plot_graphs3d_nu(no_noise, noise, ekf, neural, ekf_flag)
-            # self.plot_graphs3d_pos(no_noise, noise, ekf, neural, ekf_flag)
-            # print('pass')
+
 
         except:
             e = sys.exc_info()

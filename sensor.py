@@ -18,6 +18,9 @@ class Sensor:
         self.uvw_array = []
         self.phi_theta_psi_array = []
         self.pqr_array = []
+        self.pos_1 = 0.0
+        self.uvw_1 = 0.0
+        # self.uvw_gps = 0.0
   
     def imu_model_dynamics(self, w1, w2, w3, w4, phi_theta_psi, t, pos, uvw, pqr, noise_flag, glb):
             m = params.m
@@ -50,7 +53,7 @@ class Sensor:
                     [       cos(theta)*cos(psi),                         cos(theta)*sin(psi),                                   -sin(theta)],     
                     [sin(phi)*sin(theta)*cos(psi)-cos(phi)*sin(psi),  sin(phi)*sin(theta)*sin(psi)+cos(phi)*cos(psi),   sin(phi)*cos(theta)],
                     [cos(phi)*sin(theta)*cos(psi)+sin(phi)*sin(psi),  cos(phi)*sin(theta)*sin(psi)-sin(phi)*cos(psi),   cos(phi)*cos(theta)]])
-                                    
+            self.R_b_v = R_b_v                                    
             R_pqr = np.array([
                     [1,     sin(phi)*tan(theta),                   cos(phi)*tan(theta)],
                     [0,                cos(phi),                             -sin(phi)],
@@ -63,7 +66,7 @@ class Sensor:
             # forces = np.array([[0],[0],[F_total]])
             # glb.state[15] = F_total 
             uvw_dot = np.array([[0], [0], [(1/m)*F_total]]) - np.array([[-g*sin(theta)],[g*cos(theta)*sin(phi)],[g*cos(theta)*cos(phi)]]) + np.array([[r*v - q*w],[p*w - r*u],[q*u - p*v]])
-            
+            self.uvw_dot = uvw_dot
             # uvw_dot + disturbance
             # uvw_dot = foo2
             # print(uvw_dot)
@@ -79,7 +82,7 @@ class Sensor:
                 uvw_dot[0][0] = uvw_dot[0][0] + gauss(0,0.1)
                 uvw_dot[1][0] = uvw_dot[1][0] + gauss(0,0.1)
                 uvw_dot[2][0] = uvw_dot[2][0] + gauss(0,0.1)
-                # uvw_dot[2][0] = uvw_dot[2][0] 
+                uvw_dot[2][0] = uvw_dot[2][0] 
             ######END of Noise#########    
             uvw = uvw + np.transpose(uvw_dot*dt) + disturbance
             pos_dot = np.dot(uvw ,np.transpose(R_b_v) )
@@ -87,14 +90,28 @@ class Sensor:
             # # print(np.shape(uvw))
             # pos_dot = uvw
             pos = pos + pos_dot*dt
+            # self.pos = pos
             # 
             #     
-            ###########################        
-
+            ###########################   
+            # 
+        #    if t == 5100:
+        #         print('here')      
+            # w1t0 = 0
             p_dot = (l*Kf*(w2**2 - w4**2) - q*r*(Izz-Iyy))/Ixx  #% Rotation along +ve Xb axis
             q_dot = (l*Kf*(w3**2 - w1**2) - p*r*(Ixx - Izz))/Iyy #% Rotation along +ve Yb axis
             r_dot = Km*(w1**2 - w2**2 + w3**2 - w4**2)/Izz  -p*q*(Iyy - Ixx)/Izz
-
+            # if r_dot:
+            #     w1t0 = w1
+            #     w2t0 = w2
+            #     w3t0 = w3
+            #     w4t0 = w4
+            #     pt0 = p
+            #     qt0 = q
+            # elif w1t0 !=0:
+            #     print(f'w1: {w1t0}, w2: {w2t0},w3: {w3t0},w4: {w4t0},pt0: {pt0},qt0: {qt0}')
+            # else:
+            #     print(r_dot)
             # ------------------------
             # logging.info(f'IMU:p_dot :, {p_dot}, q_dot :, {q_dot}, r_dot:, {r_dot}')
             # logging.info(f'IMU:w2: {w2}, w4: {w4}, w3: {w3}, w1: {w1}')
@@ -127,22 +144,40 @@ class Sensor:
             
             return uvw_dot, pos, uvw, phi_theta_psi, pqr
 
-    def gps_module(self, first_time_file_read, step_number, glb):
-        global_vars = glb
-        if first_time_file_read :
-            self.pos_data = global_vars.file_read('pos_array')
-            self.vel_array = global_vars.file_read('vel_array')
-            self.phi_theta_psi_array = global_vars.file_read('phi_theta_psi_array')
-            glb.first_time_file_read = False
-        temp_pos = self.pos_data[step_number]
+    def gps_module(self, temp_pos, temp_vel, temp_phi_theta_psi):
         # temp_pos[0] = temp_pos[0] + gauss(0,2.5)
         # temp_pos[1] = temp_pos[1] + gauss(0,2.5)
         # temp_pos[2] = temp_pos[2] + gauss(0,2.5)
-        # print(temp_pos)
-        temp_vel = self.vel_array[step_number]
-        temp_phi_theta_psi = self.phi_theta_psi_array[step_number]
+
         return temp_pos, temp_vel, temp_phi_theta_psi
 
+
+# ----------------------------------------------------------------------------------------
+    # def gps_module(self, first_time_file_read, step_number, glb):
+    #     global_vars = glb
+    #     if step_number < 5:
+    #         step_number = 5
+    #     if first_time_file_read :
+    #         self.pos_data = global_vars.file_read('pos_array')
+    #         self.vel_array = global_vars.file_read('vel_array')
+    #         self.phi_theta_psi_array = global_vars.file_read('phi_theta_psi_array')
+    #         glb.first_time_file_read = False
+    #     temp_pos = [np.mean(e) for e in self.pos_data[int(step_number-5):int(step_number+5)]]
+    #     # temp_pos[0] = temp_pos[0] + gauss(0,2.5)
+    #     # temp_pos[1] = temp_pos[1] + gauss(0,2.5)
+    #     # temp_pos[2] = temp_pos[2] + gauss(0,2.5)
+    #     # print(temp_pos)
+    #     temp_vel = self.vel_array[step_number]
+    #     temp_phi_theta_psi = self.phi_theta_psi_array[step_number]
+    #     return temp_pos, temp_vel, temp_phi_theta_psi
+    
+    # @staticmethod
+    # def avg(lis):
+    #     avg =  lambda x: sum(x)/len(x)
+    #     x = avg([x[0] for x in lis])
+    #     y = avg([y[1] for y in lis])
+    #     z = avg([z[2] for z in lis])
+    #     return [x, y, z]
 
             
         

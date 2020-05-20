@@ -4,16 +4,16 @@ import torchvision.transforms as transforms
 import numpy as np
 from global_vars import global_vars
 import logging
-
+PATH = '.\\weights\\weight.pth'
 class Neuralnet:
 
-    def __init__(self, x_in, y_in):
-        self.neural_net_train(x_in, y_in)
+    def __init__(self, x_in, y_in, load_flag):
+        self.neural_net_train(x_in, y_in, load_flag)
 
     # def __init__(self):
     #     pass
 
-    def neural_net_train(self, x_in, y_in):
+    def neural_net_train(self, x_in, y_in, load_flag):
         # N is batch size; D_in is input dimension;
         # H is hidden dimension; D_out is output dimension.
         N, D_in, H, D_out = 64, 1000, 30, 10
@@ -37,36 +37,40 @@ class Neuralnet:
         #     self.ReLU,
         #     self.linear2(H, self.y.size()[1]),
         # )
-        self.model = torch.nn.Sequential(
-                torch.nn.Linear(self.x.size()[1], H),
-                torch.nn.ReLU(),
-                torch.nn.Linear(H, H),
-                torch.nn.ReLU(),
-                torch.nn.Linear(H, self.y.size()[1]),
-            ).double()
+        if load_flag:
+            self.model.load_state_dict(torch.load(PATH))
+        else:            
+            self.model = torch.nn.Sequential(
+                    torch.nn.Linear(self.x.size()[1], H),
+                    torch.nn.ReLU(),
+                    torch.nn.Linear(H, H),
+                    torch.nn.ReLU(),
+                    torch.nn.Linear(H, self.y.size()[1]),
+                ).double()
 
-        self.loss_fn = torch.nn.MSELoss(reduction='mean')
+            self.loss_fn = torch.nn.MSELoss(reduction='mean')
 
-        # Use the optim package to define an Optimizer that will update the weights of
-        # the model for us. Here we will use Adam; the optim package contains many other
-        # optimization algoriths. The first argument to the Adam constructor tells the
-        # optimizer which Tensors it should update.
-        learning_rate = 1e-4
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=learning_rate)
-        # self.optimizer = torch.optim.Adagrad(self.model.parameters(), lr=learning_rate)
-        # x_new = x
-        loss_array = []
-        # print(self.x.shape)
-        # print(self.y.shape)
-        for t in range(2000):
-            y_pred = self.model(self.x)
-            self.loss = self.loss_fn(y_pred, self.y)
-            # loss  = self.neural_net_update(self.y,y_pred,t)
-            self.optimizer.zero_grad()
-            self.loss.backward()
-            self.optimizer.step()
-            loss_array.append(self.loss.detach().numpy().tolist())
-        global_vars.file_write( 'loss_array_train', loss_array)
+            # Use the optim package to define an Optimizer that will update the weights of
+            # the model for us. Here we will use Adam; the optim package contains many other
+            # optimization algoriths. The first argument to the Adam constructor tells the
+            # optimizer which Tensors it should update.
+            learning_rate = 1e-4
+            self.optimizer = torch.optim.Adam(self.model.parameters(), lr=learning_rate)
+            # self.optimizer = torch.optim.Adagrad(self.model.parameters(), lr=learning_rate)
+            # x_new = x
+            loss_array = []
+            # print(self.x.shape)
+            # print(self.y.shape)
+            for t in range(2000):
+                y_pred = self.model(self.x)
+                self.loss = self.loss_fn(y_pred, self.y)
+                # loss  = self.neural_net_update(self.y,y_pred,t)
+                self.optimizer.zero_grad()
+                self.loss.backward()
+                self.optimizer.step()
+                loss_array.append(self.loss.detach().numpy().tolist())
+            # torch.save(self.model.state_dict(),PATH)    
+            global_vars.file_write( 'loss_array_train', loss_array)
    
     def neural_net_predict(self, x_new):
         model = self.model
@@ -82,8 +86,8 @@ class Neuralnet:
         # print(f'y_new: {y_new}, y_pred: {y_pred}')
         # Compute and print loss.
         self.loss = loss_fn(y_pred, y_new)
-        logging.info(y_pred)
-        logging.info(y_new)
+        # logging.info(y_pred)
+        # logging.info(y_new)
         
         # print(t, self.loss.item())
         
