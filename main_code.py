@@ -31,10 +31,10 @@ def motor_saturation(w):
         return w
 
 def angle_saturation(angle):
-    if angle >= 0.2:
-            angle = 0.2
-    elif angle <= -0.2:
-            angle = -0.2
+    # if angle >= 0.55:
+    #         angle = 0.55
+    # elif angle <= -0.55:
+    #         angle = -0.55
     return angle
 
 
@@ -109,13 +109,13 @@ def main():
         #                       [17*4, 25*3, 34*1], 
         #                       [-60, 20, 60]])         #waypoint in cm
         waypoints = np.array([
-                              [10, 10, 10], 
-                              [10, 10, 10]])
+                              [40, 40, 40], 
+                              [40, 40, 40]])
 
         # % waypoints = [-12  45 -19];
         # t_sim  = 80
         factor = 100
-        t_sim  = 25
+        t_sim  = 60
         target_waypoint = 0
 
         logging.info('Setting Parmerters')
@@ -148,8 +148,8 @@ def main():
             quad = Quadcopter() 
             imu = Sensor()
             step_number = 0         
-            s_intv = 5
-            e_intv = 3
+            s_intv = 30
+            e_intv = 50
             glb.waypoints = waypoints
             glb.factor = factor
             ###############################
@@ -203,7 +203,8 @@ def main():
 
                 if sim == 'noise' or sim == 'ekf' or sim =='neural_nets':
                 # if sim == 'noise':                
-                    acc, pos, vel, phi_theta_psi, pqr = quad.quad_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, True, glb)
+                    # acc, pos, vel, phi_theta_psi, pqr = quad.quad_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, True, glb)
+                    acc, pos, vel, phi_theta_psi, pqr = imu.imu_model_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)  #This line used for measurement of GPS ##IMP##
                     imu.acc, imu.pos, imu.uvw, imu.phi_theta_psi, imu.pqr = imu.imu_model_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, True, glb)
                     # print(f'pos: {pos} ,imu:{imu.pos}')
                 else:
@@ -259,6 +260,7 @@ def main():
                 ######################
                 if sim == 'ekf' or sim == 'neural_nets':
                     # temp_pos, temp_vel, temp_phi_theta_psi = imu.gps_module(glb.first_time_file_read, step_number, glb)
+                    time_intv = range(int(s_intv), int(e_intv))
                     temp_pos, temp_vel, temp_phi_theta_psi = imu.gps_module(temp_pos, temp_vel, temp_phi_theta_psi)
                     # print(f'pos: {pos}, temp_pos: {temp_pos}, t:{t} ')
 
@@ -274,7 +276,7 @@ def main():
                     glb.state[8] = imu.pqr[2]
                     gps = [temp_pos[0], temp_pos[1], temp_pos[2] , temp_vel[0], temp_vel[1], temp_vel[2], temp_phi_theta_psi[0], temp_phi_theta_psi[1], temp_phi_theta_psi[2]]
                     # if t > 3*factor and t < 3.5*factor :
-                    time_intv = range(int(s_intv), int(e_intv)) 
+                    # time_intv = range(int(s_intv), int(e_intv)) 
                     # if t in range(int(1*factor), int (3*factor)) or t in range(int(4*factor), int(7*factor)) or t in range(int(8*factor), int(11*factor)) or t != 0:
                     # if t in range(int(1*factor), int(t_sim*factor), 3*factor) :
                     if t in time_intv:
@@ -287,8 +289,8 @@ def main():
                         ekf_states, _ = ekf.cal_kalman_gain(dt, [], t, glb)
                         # Signal after every 3 sec
                         if t > e_intv-2:
-                            s_intv = e_intv + 5
-                            e_intv = s_intv + 3
+                            s_intv = e_intv + 1
+                            e_intv = s_intv + 20
                         if sim == 'neural_nets':
                             nn_ekf_states, _ , loss_val = nn_ekf.cal_kalman_gain(dt, nn_obj, ann_input, gps_nn, np.array(gps), False, glb)
 

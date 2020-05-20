@@ -82,7 +82,7 @@ class Sensor:
                 uvw_dot[0][0] = uvw_dot[0][0] + gauss(0,0.1)
                 uvw_dot[1][0] = uvw_dot[1][0] + gauss(0,0.1)
                 uvw_dot[2][0] = uvw_dot[2][0] + gauss(0,0.1)
-                uvw_dot[2][0] = uvw_dot[2][0] 
+                # uvw_dot[2][0] = uvw_dot[2][0] 
             ######END of Noise#########    
             uvw = uvw + np.transpose(uvw_dot*dt) + disturbance
             pos_dot = np.dot(uvw ,np.transpose(R_b_v) )
@@ -145,9 +145,10 @@ class Sensor:
             return uvw_dot, pos, uvw, phi_theta_psi, pqr
 
     def gps_module(self, temp_pos, temp_vel, temp_phi_theta_psi):
+        # print(f'temp_pos[0]:{temp_pos[0]}, gauss(0,2.0): {gauss(0,2.0)}')
         temp_pos[0] = temp_pos[0] + gauss(0,2.5)
-        temp_pos[1] = temp_pos[1] + gauss(0,2.5)
-        temp_pos[2] = temp_pos[2] + gauss(0,2.5)
+        # temp_pos[1] = temp_pos[1] + gauss(0,2.5)
+        # temp_pos[2] = temp_pos[2] + gauss(0,2.5)
 
         return temp_pos, temp_vel, temp_phi_theta_psi
 

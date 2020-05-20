@@ -15,10 +15,10 @@ class Plot_graph:
         glb = global_vars
         try:
             no_noise = sim_data['no_noise']
-            self.graph_for_position_error( no_noise, glb)        
-            self.graph_for_attitude_related_error(no_noise, glb)
-            self.graph_for_position_values(no_noise, glb)
-            self.graph_for_angular_speed_motor(no_noise, glb)
+            # self.graph_for_position_error( no_noise, glb)        
+            # self.graph_for_attitude_related_error(no_noise, glb)
+            # self.graph_for_position_values(no_noise, glb)
+            # self.graph_for_angular_speed_motor(no_noise, glb)
             # self.plot_loss_train('no_noise')
             # self.plot_loss_test('no_noise')
         except:
