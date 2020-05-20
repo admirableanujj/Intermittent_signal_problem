@@ -115,15 +115,14 @@ def main():
         # % waypoints = [-12  45 -19];
         # t_sim  = 80
         factor = 100
-        t_sim  = 60
+        t_sim  = 80
         target_waypoint = 0
 
         logging.info('Setting Parmerters')
 
-
         sim_data = {}
         # ['no_noise', 'noise', 'ekf', 'neural_nets']
-        for sim in ['no_noise','noise', 'ekf']:
+        for sim in ['no_noise','noise', 'ekf','neural_nets']:
             ekf = extended_Kalman_Filter()
             nn_ekf = nn_EKF()
             logging.info(f'{sim}')
@@ -210,7 +209,7 @@ def main():
                 else:
                     acc, pos, vel, phi_theta_psi, pqr = quad.quad_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)
                     imu.acc, imu.pos, imu.uvw, imu.phi_theta_psi, imu.pqr = imu.imu_model_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)
-                    if False:
+                    if True:
                         acc = imu.acc
                         pos = imu.pos
                         vel = imu.uvw
@@ -400,12 +399,12 @@ def main():
                 step_number = step_number + 1
                 # print(glb.state_ekf)
                 # ---------------for Neural net
-                row = [pos[0], pos[1], pos[2], vel[0], vel[1], vel[2], phi, theta, psi, acc[0][0], acc[1][0], acc[2][0], w1, w2, w3, w4]
+                row = [pos[0], pos[1], pos[2], vel[0], vel[1], vel[2], phi, theta, psi, acc[0][0], acc[1][0], acc[2][0], w1, w2, w3, w4,p, q, r, t]
                 # row = [pos[0], pos[1], pos[2], vel[0], vel[1], vel[2], phi, theta, psi, w1, w2, w3, w4]
                 ann_input = np.array(row)
                 # ---------------for Neural net
                 # fields = ['px', 'py', 'pz', 'dpx', 'dpy', 'dpz', 'phi', 'theta', 'psi', 'ax', 'ay', 'az', 'w1', 'w2', 'w3','w4']
-                glb.rows.insert(index, row)
+                glb.rows.insert(t, row)
                 glb.loss_val.insert(index, loss_val)
 
 
@@ -446,11 +445,11 @@ def main():
                 global_vars.file_write('p_matrix_array', glb.p_matrix_array)
 
             if sim == 'no_noise':
-                global_vars.file_write( 'pos_array', glb.pos_array)
-                global_vars.file_write( 'vel_array', glb.vel_array)
-                global_vars.file_write( 'phi_theta_psi_array', glb.phi_theta_psi_array)
+                # global_vars.file_write( 'pos_array', glb.pos_array)
+                # global_vars.file_write( 'vel_array', glb.vel_array)
+                # global_vars.file_write( 'phi_theta_psi_array', glb.phi_theta_psi_array)
                 # ---------------------------
-                fields = ['px', 'py', 'pz', 'dpx', 'dpy', 'dpz', 'phi', 'theta', 'psi', 'ax', 'ay', 'az', 'w1', 'w2', 'w3','w4']
+                fields = ['px', 'py', 'pz', 'dpx', 'dpy', 'dpz', 'phi', 'theta', 'psi', 'ax', 'ay', 'az', 'w1', 'w2', 'w3','w4','p', 'q', 'r', 't']
                 rows = glb.rows
                 file_name = 'train_data.csv'
                 file_write_csv(file_name, rows, fields)

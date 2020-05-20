@@ -54,7 +54,7 @@ class Plot_graph:
             # self.plot_acc_array(no_noise, noise, no_noise,ekf_flag)
             print(f'No z axis graph for you.: {e}')
         self.graph_for_position_values2(no_noise, {'ekf':ekf})
-        # self.graph_for_position_values2(no_noise, {'neural':neural})
+        self.graph_for_position_values2(no_noise, {'neural':neural})
         # ani =  animation.sameAxisAnimation(noise, glb)        
         # plt.show()   
     
@@ -68,9 +68,9 @@ class Plot_graph:
             ax = fig3.add_subplot(131+i)
             X_scale = np.linspace(0,(len(data.get('glb.position_final_required_array'))+1)*params.dt,len(data.get('glb.position_final_required_array'))+1)
             X_scale = X_scale[0:-1]
-            line31a=ax.plot(X_scale, [x[i] for x in data.get('glb.position_final_required_array')],'r')
-            line31b=ax.plot(X_scale, [x[i] for x in true.get('glb.pos_array')], 'b')
-            line31c=ax.plot(X_scale, [x[i] for x in data.get('imu.pos_array')], 'g')
+            line31a=ax.plot(X_scale, [x[i]/10 for x in data.get('glb.position_final_required_array')],'r')
+            line31b=ax.plot(X_scale, [x[i]/10 for x in true.get('glb.pos_array')], 'b')
+            line31c=ax.plot(X_scale, [x[i]/10 for x in data.get('imu.pos_array')], 'g')
             line31a[0].set_label(f'pos {n[i]} Desired')
             line31b[0].set_label(f'pos {n[i]} true')
             line31c[0].set_label(f'pos {n[i]} {data_name}')
