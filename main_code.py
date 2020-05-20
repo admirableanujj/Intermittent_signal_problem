@@ -114,8 +114,8 @@ def main():
 
         # % waypoints = [-12  45 -19];
         # t_sim  = 80
-        t_sim  = 25
         factor = 100
+        t_sim  = 25
         target_waypoint = 0
 
         logging.info('Setting Parmerters')
@@ -151,10 +151,12 @@ def main():
             s_intv = 5
             e_intv = 3
             glb.waypoints = waypoints
+            glb.factor = factor
             ###############################
             for t in range(0, t_sim*factor, int(params.dt*factor)):
                 # print(t)
                 waypoint_desired = waypoints[i][0:3]
+                # print(waypoint_desired)
                 # if sim == 'ekf':
                 #     print(abs(glb.error_x) + abs(glb.error_y) + abs(glb.error_z))
                 # print(waypoint_desired)
@@ -302,7 +304,7 @@ def main():
                         # print(sid)
                         # # print(states)
                         # print(ekf_states)
-                        print(f'pos: {pos}, ekf_states: {ekf_states[0][0:3]}, t:{t}')
+                        # print(f'pos: {pos}, ekf_states: {ekf_states[0][0:3]}, t:{t}')
 
                     if ekf_states.ndim > 1 :
                         ekf_states = ekf_states[0]
@@ -385,7 +387,7 @@ def main():
                 glb.error_xdes_array.insert(index, 0)
                 glb.error_ydes_array.insert(index, 0)
                 glb.error_zdes_array.insert(index, 0)
-
+                
                 imu.acc_array.insert(index, imu.acc)
                 imu.pos_array.insert(index, imu.pos)
                 imu.uvw_array.insert(index, imu.uvw)

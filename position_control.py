@@ -1,4 +1,5 @@
 import numpy as np 
+import params
 
 class Position_Control:
 
@@ -61,8 +62,8 @@ class Position_Control:
         # % Saturation cap for position control of 11 units
         # print(glb.error_x)
         for no in range(0,3):
-            if abs(error[no]) > 11:
-                error[no] = 11 * np.sign(error[no])
+            if abs(error[no]) > 11*params.dt:
+                error[no] = 11 * np.sign(error[no]) *params.dt
         glb.error_x_virtual = error[0]
         glb.error_y_virtual = error[1]
         glb.error_z_virtual = error[2]
@@ -96,6 +97,7 @@ class Position_Control:
         #####################GLobal Variable
         glb.position_final_required_array.append(np.transpose(pos_des))
         glb.vel_final_required_array.append(np.transpose(vel_des))
+        # print(pos)
         glb.pos_array.append(np.transpose(pos))
         glb.vel_array.append(np.transpose(vel))
 

@@ -58,6 +58,7 @@ class global_vars:
         self.p_matrix_array = []
         self.kalman_gain_array = []
         self.waypoints = []
+        self.factor = 0
 
     @staticmethod
     def file_write(file_name, data_set):

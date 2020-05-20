@@ -145,9 +145,9 @@ class Sensor:
             return uvw_dot, pos, uvw, phi_theta_psi, pqr
 
     def gps_module(self, temp_pos, temp_vel, temp_phi_theta_psi):
-        # temp_pos[0] = temp_pos[0] + gauss(0,2.5)
-        # temp_pos[1] = temp_pos[1] + gauss(0,2.5)
-        # temp_pos[2] = temp_pos[2] + gauss(0,2.5)
+        temp_pos[0] = temp_pos[0] + gauss(0,2.5)
+        temp_pos[1] = temp_pos[1] + gauss(0,2.5)
+        temp_pos[2] = temp_pos[2] + gauss(0,2.5)
 
         return temp_pos, temp_vel, temp_phi_theta_psi
 
