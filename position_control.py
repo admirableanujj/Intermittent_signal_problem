@@ -62,8 +62,8 @@ class Position_Control:
         # % Saturation cap for position control of 11 units
         # print(glb.error_x)
         for no in range(0,3):
-            if abs(error[no]) > 11:
-                error[no] = 11 * np.sign(error[no])
+            if abs(error[no]) > 20:
+                error[no] = 20 * np.sign(error[no])
         glb.error_x_virtual = error[0]
         glb.error_y_virtual = error[1]
         glb.error_z_virtual = error[2]

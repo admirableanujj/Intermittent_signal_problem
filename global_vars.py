@@ -59,6 +59,7 @@ class global_vars:
         self.kalman_gain_array = []
         self.waypoints = []
         self.factor = 0
+        self.qpos_array = []
 
     @staticmethod
     def file_write(file_name, data_set):

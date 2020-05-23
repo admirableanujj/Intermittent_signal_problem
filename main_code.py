@@ -202,7 +202,7 @@ def main():
 
                 if sim == 'noise' or sim == 'ekf' or sim =='neural_nets':
                 # if sim == 'noise':                
-                    # acc, pos, vel, phi_theta_psi, pqr = quad.quad_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, True, glb)
+                    qacc, qpos, qvel, qphi_theta_psi, qpqr = quad.quad_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)
                     acc, pos, vel, phi_theta_psi, pqr = imu.imu_model_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)  #This line used for measurement of GPS ##IMP##
                     imu.acc, imu.pos, imu.uvw, imu.phi_theta_psi, imu.pqr = imu.imu_model_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, True, glb)
                     # print(f'pos: {pos} ,imu:{imu.pos}')
@@ -216,7 +216,7 @@ def main():
                         phi_theta_psi = imu.phi_theta_psi
                         pqr = imu.pqr 
 
-                # print(np.shape(imu.acc))
+                # print(f'{qpos}')
                 # logging.info(f'IMU: imu.acc: {imu.acc}, imu.pos:{imu.pos}, imu.uvw:{imu.uvw}, imu.phi_theta_psi:{imu.phi_theta_psi}, imu.pqr: {imu.pqr}')
                 # logging.info(f'QUAD: acc: {acc}, pos:{pos}, vel:{vel}, phi_theta_psi:{phi_theta_psi}, pqr: {pqr}')
                 # logging.info('---------------------------------')
@@ -376,7 +376,8 @@ def main():
 
 
                 #%%%%%%%%%%%%%%% END OF Nueral net test IMPLEMENTATION %%%%%%%
-                
+                if sim == 'ekf':
+                    glb.qpos_array.insert(index, qpos)
                 glb.w_des_array.insert(index, [w1, w2, w3, w4])
                 glb.error_x_array.insert(index, glb.error_x)
                 glb.error_y_array.insert(index,  glb.error_y)
@@ -406,6 +407,20 @@ def main():
                 # fields = ['px', 'py', 'pz', 'dpx', 'dpy', 'dpz', 'phi', 'theta', 'psi', 'ax', 'ay', 'az', 'w1', 'w2', 'w3','w4']
                 glb.rows.insert(t, row)
                 glb.loss_val.insert(index, loss_val)
+                
+                if sim == "ekf_flag":
+                    if ekf_states.ndim > 1 :
+                        ekf_states = ekf_states[0]
+                    pos[0] =   glb.state_ekf[0]
+                    pos[1] =   glb.state_ekf[1]
+                    pos[2] =   glb.state_ekf[2]
+                    phi    =   glb.state_ekf[6]
+                    theta  =   glb.state_ekf[7]
+                    psi    =   glb.state_ekf[8]
+                    vel[0] =   glb.state_ekf[3]
+                    vel[1] =   glb.state_ekf[4]
+                    vel[2] =   glb.state_ekf[5]
+
 
 
             ################ Compiling data from all runs ###########
