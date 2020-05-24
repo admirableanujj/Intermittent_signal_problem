@@ -234,12 +234,8 @@ def main():
                 ######################
                 # Implementing IMU model.
                 ######################
-                if sim == 'noise'or sim == 'ekf' or sim == 'neural_nets':
+                if sim == 'noise':
                 # if sim == 'noise' or 'ekf':
-                    temp_pos = qpos
-                    temp_vel = qvel
-                    temp_phi_theta_psi = qphi_theta_psi
-
                     pos[0] =   imu.pos[0]
                     pos[1] =   imu.pos[1]
                     pos[2] =   imu.pos[2]
@@ -263,7 +259,7 @@ def main():
                 if sim == 'ekf' or sim == 'neural_nets':
                     # temp_pos, temp_vel, temp_phi_theta_psi = imu.gps_module(glb.first_time_file_read, step_number, glb)
                     time_intv = range(int(s_intv), int(e_intv))
-                    temp_pos, temp_vel, temp_phi_theta_psi = imu.gps_module(temp_pos, temp_vel, temp_phi_theta_psi)
+                    temp_pos, temp_vel, temp_phi_theta_psi = imu.gps_module(qpos, qvel, qphi_theta_psi)
                     # print(f'pos: {pos}, temp_pos: {temp_pos}, t:{t} ')
 
                     ekf_flag = True
