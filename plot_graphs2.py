@@ -58,7 +58,7 @@ class Plot_graph:
         # self.graph_for_position_values2(no_noise, {'neural':neural})
         self.graph_for_position_values({'ekf':ekf})
         # self.graph_for_pos_difference({'ekf':ekf})
-        self.graph_for_position_values({'neural':neural})
+        # self.graph_for_position_values({'neural':neural})
         # ani =  animation.sameAxisAnimation(noise, glb)        
         # plt.show()   
     

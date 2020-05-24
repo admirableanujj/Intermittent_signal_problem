@@ -257,10 +257,8 @@ def main():
                 # Implementing Kalman filter.
                 ######################
                 if sim == 'ekf' or sim == 'neural_nets':
-                    # temp_pos, temp_vel, temp_phi_theta_psi = imu.gps_module(glb.first_time_file_read, step_number, glb)
                     time_intv = range(int(s_intv), int(e_intv))
                     temp_pos, temp_vel, temp_phi_theta_psi = imu.gps_module(qpos, qvel, qphi_theta_psi)
-                    # print(f'pos: {pos}, temp_pos: {temp_pos}, t:{t} ')
 
                     ekf_flag = True
                     glb.state[0] = imu.uvw[0]  
@@ -273,10 +271,7 @@ def main():
                     glb.state[7] = imu.pqr[1]
                     glb.state[8] = imu.pqr[2]
                     gps = [temp_pos[0], temp_pos[1], temp_pos[2] , temp_vel[0], temp_vel[1], temp_vel[2], temp_phi_theta_psi[0], temp_phi_theta_psi[1], temp_phi_theta_psi[2]]
-                    # if t > 3*factor and t < 3.5*factor :
-                    # time_intv = range(int(s_intv), int(e_intv)) 
-                    # if t in range(int(1*factor), int (3*factor)) or t in range(int(4*factor), int(7*factor)) or t in range(int(8*factor), int(11*factor)) or t != 0:
-                    # if t in range(int(1*factor), int(t_sim*factor), 3*factor) :
+
                     if t in time_intv:
                         # print(time_intv)
                         # print(f's_intv:{s_intv},e_intv:{e_intv},t:{t}')
@@ -301,9 +296,6 @@ def main():
                         ekf_states, _ = ekf.cal_kalman_gain(dt, gps, t, glb)
                         if sim == 'neural_nets':
                             nn_ekf_states, _ , loss_val = nn_ekf.cal_kalman_gain(dt, nn_obj, ann_input, gps_nn, np.array(gps), True, glb)
-                        # print(sid)
-                        # # print(states)
-                        # print(ekf_states)
                         # print(f'pos: {pos}, ekf_states: {ekf_states[0][0:3]}, t:{t}')
 
                     if ekf_states.ndim > 1 :
@@ -317,15 +309,6 @@ def main():
                     glb.state_ekf[6]  =  ekf_states[6]
                     glb.state_ekf[7]  =  ekf_states[7]
                     glb.state_ekf[8]  =  ekf_states[8]
-                        # pn = pos[1]    
-                        # pe = pos[0]     
-                        # pd = pos[2]  
-                        # glb.state[0]  = pos[0]    
-                        # glb.state[1]  = pos[1]     
-                        # glb.state[2]  = pos[2] 
-                        # glb.state[9]  = vel[0]    
-                        # glb.state[10] = vel[1]     
-                        # glb.state[11] = vel[2] 
                         # --------------------------
                     # pos[0] =   glb.state_ekf[0]
                     # pos[1] =   glb.state_ekf[1]
@@ -356,21 +339,6 @@ def main():
                     glb.state_ekf[6]  =  nn_ekf_states[6]
                     glb.state_ekf[7]  =  nn_ekf_states[7]
                     glb.state_ekf[8]  =  nn_ekf_states[8]
-                    # pos[0] =   glb.state_ekf[0]
-                    # pos[1] =   glb.state_ekf[1]
-                    # pos[2] =   glb.state_ekf[2]
-                    # phi    =   glb.state_ekf[6]
-                    # theta  =   glb.state_ekf[7]
-                    # psi    =   glb.state_ekf[8]
-                    # vel[0] =   glb.state_ekf[3]
-                    # vel[1] =   glb.state_ekf[4]
-                    # vel[2] =   glb.state_ekf[5]
-                    # print(sid.tolist())
-                    # # print('-----------')
-                    # glb.p_matrix_array.insert(index, sid.tolist())
-                    # if t==1*factor :
-                    #     p_matrix_array = global_vars.file_read2('p_matrix_array')
-                    #     print(p_matrix_array)
                         
 
 
