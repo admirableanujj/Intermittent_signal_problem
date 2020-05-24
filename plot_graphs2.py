@@ -41,10 +41,10 @@ class Plot_graph:
             e = sys.exc_info()
             print(f"ekf_Error:{e}")
         try:
-            neural = sim_data['neural_nets']
+            neural = sim_data['neural']
         except:
             e = sys.exc_info()
-            print(f"Nuera_nets: {e}")
+            print(f"Nueral_nets: {e}")
         try:
             pass
 

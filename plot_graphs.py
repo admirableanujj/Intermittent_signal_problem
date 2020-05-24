@@ -45,7 +45,7 @@ class Plot_graph:
             e = sys.exc_info()
             print(f"ekf_Error:{e}")
         try:
-            neural = sim_data['neural_nets']
+            neural = sim_data['neural']
             self.graph_for_position_error(neural, glb)
             self.graph_for_attitude_related_error(neural, glb)
             self.graph_for_position_values(neural, glb)
