@@ -122,7 +122,7 @@ def main():
 
         sim_data = {}
         # ['no_noise', 'noise', 'ekf', 'neural_nets']
-        for sim in ['no_noise','noise', 'ekf','neural_nets']:
+        for sim in ['no_noise','noise', 'ekf','neural']:
             ekf = extended_Kalman_Filter()
             nn_ekf = nn_EKF()
             logging.info(f'{sim}')
@@ -200,7 +200,7 @@ def main():
                 # %=======================END OF POSITION CONTROL LOOP==============
                 # %%%%%% ==========  DYNAMICS OF THE QUADROTOR ==========  %%%%%%%%%
 
-                if sim == 'noise' or sim == 'ekf' or sim =='neural_nets':
+                if sim == 'noise' or sim == 'ekf' or sim =='neural':
                 # if sim == 'noise':                
                     _, qpos, qvel, qphi_theta_psi, qpqr = quad.quad_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)
                     acc, pos, vel, phi_theta_psi, pqr = imu.imu_model_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)  #This line used for measurement of GPS ##IMP##
@@ -256,7 +256,7 @@ def main():
                 ######################
                 # Implementing Kalman filter.
                 ######################
-                if sim == 'ekf' or sim == 'neural_nets':
+                if sim == 'ekf' or sim == 'neural':
                     time_intv = range(int(s_intv), int(e_intv))
                     temp_pos, temp_vel, temp_phi_theta_psi = imu.gps_module(qpos, qvel, qphi_theta_psi)
 
@@ -284,7 +284,7 @@ def main():
                         if t > e_intv-2:
                             s_intv = e_intv + 1
                             e_intv = s_intv + factor
-                        if sim == 'neural_nets':
+                        if sim == 'neural':
                             nn_ekf_states, _ , loss_val = nn_ekf.cal_kalman_gain(dt, nn_obj, ann_input, gps_nn, np.array(gps), False, glb)
 
                     else:
@@ -294,7 +294,7 @@ def main():
                         gps_nn = [imu.pos[0], imu.pos[1], imu.pos[2], imu.uvw[0], imu.uvw[1], imu.uvw[2], imu.phi_theta_psi[0], imu.phi_theta_psi[1], imu.phi_theta_psi[2]]
                         # fields = ['px', 'py', 'pz', 'dpx', 'dpy', 'dpz', 'phi', 'theta', 'psi', 'ax', 'ay', 'az', 'w1', 'w2', 'w3','w4']
                         ekf_states, _ = ekf.cal_kalman_gain(dt, gps, t, glb)
-                        if sim == 'neural_nets':
+                        if sim == 'neural':
                             nn_ekf_states, _ , loss_val = nn_ekf.cal_kalman_gain(dt, nn_obj, ann_input, gps_nn, np.array(gps), True, glb)
                         # print(f'pos: {pos}, ekf_states: {ekf_states[0][0:3]}, t:{t}')
 
@@ -326,7 +326,7 @@ def main():
 
                 #%%%%%%%%%%%%%%% END OF KALMAN IMPLEMENTATION %%%%%%%
                 #%%%%%%%%%%%%%%% Nueral net IMPLEMENTATION %%%%%%%
-                if sim == 'neural_nets':
+                if sim == 'neural':
                     ekf_flag = True
                     if nn_ekf_states.ndim > 1 :
                         nn_ekf_states = nn_ekf_states[0]
@@ -344,7 +344,6 @@ def main():
 
                 #%%%%%%%%%%%%%%% END OF Nueral net test IMPLEMENTATION %%%%%%%
                 if sim == 'ekf' or sim == 'neural':
-                    # print(qpos)
                     glb.qpos_array.insert(index, qpos)
                 glb.w_des_array.insert(index, [w1, w2, w3, w4])
                 glb.error_x_array.insert(index, glb.error_x)
