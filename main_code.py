@@ -283,10 +283,9 @@ def main():
                         # Signal after every 3 sec
                         if t > e_intv-2:
                             s_intv = e_intv + 1
-                            e_intv = s_intv + factor
+                            e_intv = s_intv + factor/2
                         if sim == 'neural':
-                            nn_ekf_states, _ , loss_val = nn_ekf.cal_kalman_gain(dt, nn_obj, ann_input, gps_nn, np.array(gps), False, glb)
-
+                            nn_ekf_states, _ , loss_val = nn_ekf.cal_kalman_gain(dt, nn_obj, ann_input, gps_nn, np.array(gps), False, t, glb)
                     else:
                         # print(time_intv)
                         gps = [temp_pos[0], temp_pos[1], temp_pos[2] , temp_vel[0], temp_vel[1], temp_vel[2], temp_phi_theta_psi[0], temp_phi_theta_psi[1], temp_phi_theta_psi[2]]
@@ -295,7 +294,7 @@ def main():
                         # fields = ['px', 'py', 'pz', 'dpx', 'dpy', 'dpz', 'phi', 'theta', 'psi', 'ax', 'ay', 'az', 'w1', 'w2', 'w3','w4']
                         ekf_states, _ = ekf.cal_kalman_gain(dt, gps, t, glb)
                         if sim == 'neural':
-                            nn_ekf_states, _ , loss_val = nn_ekf.cal_kalman_gain(dt, nn_obj, ann_input, gps_nn, np.array(gps), True, glb)
+                            nn_ekf_states, _ , loss_val = nn_ekf.cal_kalman_gain(dt, nn_obj, ann_input, gps_nn, np.array(gps), True, t, glb)
                         # print(f'pos: {pos}, ekf_states: {ekf_states[0][0:3]}, t:{t}')
 
                     if ekf_states.ndim > 1 :

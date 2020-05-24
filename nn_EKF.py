@@ -122,33 +122,38 @@ class neural_net_based_EKF:
     #----------------------------------------------------------------
     # Kalman Gain
     # ---------------------------------------------------------------
-    def cal_kalman_gain(self, dt, nn_model, ann_input, measure, ymea_nn, signal, glb):
+    def cal_kalman_gain(self, dt, nn_model, ann_input, measure, ymea_nn, signal, t, glb):
         # print('pos: ', quad.pos)
             # x_hat = self.state_estimate(dt,glb)
             # x_hat = nn_model.neural_net_predict(x_new)
         # print('XXHat-shape:  ', x_hat)
-            Pk = self.covariance_estimate(dt,glb)
+            # Pk = self.covariance_estimate(dt,glb)
         # print('Pk: ', Pk)
-
+            if t < 10:
+                self.x_hat = self.state_estimate(dt,glb)
+                self.Pk = self.covariance_estimate(dt,glb)
         # try:
             C = np.identity(9)
             R = self.R
             I = np.identity(9)
             # print(f'signal: {signal}')
             if signal:
-                x_hat = self.state_estimate(dt,glb)
+                x_hat = self.x_hat
+                self.Pk = self.Pk
                 self.Y = np.array([[measure[0]], [measure[1]], [measure[2]], [measure[3]], [measure[4]], [measure[5]], [measure[6]], [measure[7]], [measure[8]]])
-                L = np.nan_to_num(np.dot(np.dot(Pk,C.transpose()),np.linalg.inv(R + np.dot(np.dot(C,Pk),C.transpose()))))  #kalman_gain
+                L = np.nan_to_num(np.dot(np.dot(self.Pk,C.transpose()),np.linalg.inv(R + np.dot(np.dot(C,self.Pk),C.transpose()))))  #kalman_gain
                 foo = (x_hat + np.dot(L,(self.Y - np.dot(C,x_hat))))
                 # foo  = (x_hat + np.dot(L, np.transpose(self.Y - np.transpose(np.dot(C,x_hat))))) #same as EKF
-                self.Pk = np.dot((I - np.dot(L,C)),Pk)
+                self.Pk = np.dot((I - np.dot(L,C)),self.Pk)
             else:
                 x_hat = nn_model.neural_net_predict(ann_input).detach().numpy()
                 x_hat = np.reshape(x_hat,(len(x_hat),1))
-                L = np.nan_to_num(np.dot(np.dot(Pk,C.transpose()),np.linalg.inv(R + np.dot(np.dot(C,Pk),C.transpose()))))  #kalman_gain
+                self.Pk = self.covariance_estimate(dt,glb)
+                self.Y = np.array([[measure[0]], [measure[1]], [measure[2]], [measure[3]], [measure[4]], [measure[5]], [measure[6]], [measure[7]], [measure[8]]])
+                L = np.nan_to_num(np.dot(np.dot(self.Pk,C.transpose()),np.linalg.inv(R + np.dot(np.dot(C,self.Pk),C.transpose()))))  #kalman_gain
                 # foo = (np.transpose(x_hat) + np.dot(L,(self.Y - np.dot(C, x_hat))))
                 foo = (x_hat + np.dot(L,(self.Y - np.dot(C,x_hat))))
-                self.Pk = np.dot((I - np.dot(L,C)),Pk)
+                self.Pk = np.dot((I - np.dot(L,C)),self.Pk)
             # print(foo)
             if np.shape(x_hat) ==(9,1) and np.shape(ymea_nn) ==(9,1):
                 x_hat = np.reshape(x_hat,(len(x_hat),1))
