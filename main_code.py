@@ -31,10 +31,10 @@ def motor_saturation(w):
         return w
 
 def angle_saturation(angle):
-    # if angle >= 0.55:
-    #         angle = 0.55
-    # elif angle <= -0.55:
-    #         angle = -0.55
+    if angle >= 0.1:
+            angle = 0.1
+    elif angle <= -0.1:
+            angle = -0.1
     return angle
 
 
@@ -115,7 +115,7 @@ def main():
         # % waypoints = [-12  45 -19];
         # t_sim  = 80
         factor = 100
-        t_sim  = 80
+        t_sim  = 15
         target_waypoint = 0
 
         logging.info('Setting Parmerters')
@@ -205,7 +205,7 @@ def main():
                     qacc, qpos, qvel, qphi_theta_psi, qpqr = quad.quad_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)
                     acc, pos, vel, phi_theta_psi, pqr = imu.imu_model_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)  #This line used for measurement of GPS ##IMP##
                     imu.acc, imu.pos, imu.uvw, imu.phi_theta_psi, imu.pqr = imu.imu_model_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, True, glb)
-                    # print(f'pos: {pos} ,imu:{imu.pos}')
+                    # print(f'qpos: {pos} ,imu.pos:{imu.pos}')
                 else:
                     acc, pos, vel, phi_theta_psi, pqr = quad.quad_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)
                     imu.acc, imu.pos, imu.uvw, imu.phi_theta_psi, imu.pqr = imu.imu_model_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)
@@ -288,8 +288,8 @@ def main():
                         ekf_states, _ = ekf.cal_kalman_gain(dt, [], t, glb)
                         # Signal after every 3 sec
                         if t > e_intv-2:
-                            s_intv = e_intv + 1
-                            e_intv = s_intv + 20
+                            s_intv = e_intv + 5
+                            e_intv = s_intv + factor
                         if sim == 'neural_nets':
                             nn_ekf_states, _ , loss_val = nn_ekf.cal_kalman_gain(dt, nn_obj, ann_input, gps_nn, np.array(gps), False, glb)
 
@@ -376,7 +376,8 @@ def main():
 
 
                 #%%%%%%%%%%%%%%% END OF Nueral net test IMPLEMENTATION %%%%%%%
-                if sim == 'ekf':
+                if sim == 'ekf' or sim == 'neural':
+                    # print(qpos)
                     glb.qpos_array.insert(index, qpos)
                 glb.w_des_array.insert(index, [w1, w2, w3, w4])
                 glb.error_x_array.insert(index, glb.error_x)
@@ -449,7 +450,8 @@ def main():
                                 'imu.uvw_array': imu.uvw_array,
                                 'imu.phi_theta_psi_array': imu.phi_theta_psi_array,
                                 'imu.pqr_array': imu.pqr_array,
-                                'glb.state_ekf': glb.state_ekf}}
+                                'glb.state_ekf': glb.state_ekf,
+                                'glb.qpos_array': glb.qpos_array}}
             sim_data.update(temp_dict)
             glb.write_flag = False
             # print(valset)

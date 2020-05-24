@@ -55,8 +55,9 @@ class Plot_graph:
             print(f'No z axis graph for you.: {e}')
         self.graph_for_position_values2(no_noise, {'ekf':ekf})
         self.graph_for_position_values2(no_noise, {'neural':neural})
-        self.graph_for_position_values(no_noise, {'ekf':ekf})
-        self.graph_for_position_values(no_noise, {'neural':neural})
+        # self.graph_for_position_values({'ekf':ekf})
+        # self.graph_for_pos_difference({'ekf':ekf})
+        # self.graph_for_position_values({'neural':neural})
         # ani =  animation.sameAxisAnimation(noise, glb)        
         # plt.show()   
     
@@ -87,13 +88,15 @@ class Plot_graph:
             data_name = key
             data = value
         fig3 = plt.figure()
+        # print(data.get('glb.qpos_array'))
         n = ['x','y','z']
-        for i in range(0,3):
-            ax = fig3.add_subplot(131+i)
+        for i in range(0,1):
+            # ax = fig3.add_subplot(131+i)
+            ax = fig3.add_subplot(111)
             X_scale = np.linspace(0,(len(data.get('glb.position_final_required_array'))+1)*params.dt,len(data.get('glb.position_final_required_array'))+1)
             X_scale = X_scale[0:-1]
             line31a=ax.plot(X_scale, [x[i] for x in data.get('glb.position_final_required_array')],'r')
-            line31b=ax.plot(X_scale, [x[i] for x in data.get('glb.qpos')], 'b')
+            line31b=ax.plot(X_scale, [x[i] for x in data.get('glb.qpos_array')], 'b')
             line31c=ax.plot(X_scale, [x[i] for x in data.get('imu.pos_array')], 'g')
             line31a[0].set_label(f'pos {n[i]} Desired')
             line31b[0].set_label(f'pos {n[i]} true')
@@ -104,6 +107,34 @@ class Plot_graph:
             ax.legend(loc = 0)
             ax.set_title(f'{n[i]}_des vs {n[i]}')
 
+    
+    def graph_for_pos_difference(self, data_in):
+        for key, value in data_in.items():
+            data_name = key
+            data = value
+        fig3 = plt.figure()
+        # print(data.get('glb.qpos_array'))
+        n = ['x','y','z']
+        for i in range(0,1):
+            # ax = fig3.add_subplot(131+i)
+            ax = fig3.add_subplot(111)
+            X_scale = np.linspace(0,(len(data.get('glb.position_final_required_array'))+1)*params.dt,len(data.get('glb.position_final_required_array'))+1)
+            X_scale = X_scale[0:-1]
+            line31d = ax.plot( X_scale, [i-j for i,j in zip(data.get('glb.qpos_array'), data.get('imu.pos_array'))])
+            # line31a=ax.plot(X_scale, [x[i] for x in data.get('glb.position_final_required_array')],'r')
+            # line31b=ax.plot(X_scale, [x[i] for x in data.get('glb.qpos_array')], 'b')
+            # line31c=ax.plot(X_scale, [x[i] for x in data.get('imu.pos_array')], 'g')
+            # line31a[0].set_label(f'pos {n[i]} Desired')
+            # line31b[0].set_label(f'pos {n[i]} true')
+            # line31c[0].set_label(f'pos {n[i]} {data_name}')
+            line31d[0].set_label('Differece in x')
+            line31d[1].set_label('Differece in y')
+            line31d[2].set_label('Differece in z')
+            ax.set_xlabel('Time (in sec)')
+            ax.set_ylabel('Distance')
+            ax.legend(loc = 0)
+            ax.set_title(f'{n[i]}_des vs {n[i]}')
+    
     ##########################################################################################################
         ############################## New code same as in Plot_graph ####################################
     ##########################################################################################################
