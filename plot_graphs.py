@@ -46,10 +46,10 @@ class Plot_graph:
             print(f"ekf_Error:{e}")
         try:
             neural = sim_data['neural_nets']
-            # self.graph_for_position_error(neural, glb)
-            # self.graph_for_attitude_related_error(neural, glb)
-            # self.graph_for_position_values(neural, glb)
-            # self.graph_for_angular_speed_motor(neural, glb)
+            self.graph_for_position_error(neural, glb)
+            self.graph_for_attitude_related_error(neural, glb)
+            self.graph_for_position_values(neural, glb)
+            self.graph_for_angular_speed_motor(neural, glb)
         except:
             e = sys.exc_info()
             print(f"Nuera_nets: {e}")

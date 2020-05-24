@@ -109,13 +109,13 @@ def main():
         #                       [17*4, 25*3, 34*1], 
         #                       [-60, 20, 60]])         #waypoint in cm
         waypoints = np.array([
-                              [40, 40, 40], 
-                              [40, 40, 40]])
+                              [30, 30, 30], 
+                              [30, 30, 30]])
 
         # % waypoints = [-12  45 -19];
         # t_sim  = 80
         factor = 100
-        t_sim  = 15
+        t_sim  = 20
         target_waypoint = 0
 
         logging.info('Setting Parmerters')
@@ -202,7 +202,7 @@ def main():
 
                 if sim == 'noise' or sim == 'ekf' or sim =='neural_nets':
                 # if sim == 'noise':                
-                    qacc, qpos, qvel, qphi_theta_psi, qpqr = quad.quad_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)
+                    _, qpos, qvel, qphi_theta_psi, qpqr = quad.quad_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)
                     acc, pos, vel, phi_theta_psi, pqr = imu.imu_model_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)  #This line used for measurement of GPS ##IMP##
                     imu.acc, imu.pos, imu.uvw, imu.phi_theta_psi, imu.pqr = imu.imu_model_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, True, glb)
                     # print(f'qpos: {pos} ,imu.pos:{imu.pos}')
@@ -228,20 +228,17 @@ def main():
                 phi   = phi_theta_psi[0]
                 theta = phi_theta_psi[1]
                 psi   = phi_theta_psi[2]
-                glb.state[6] = p
-                glb.state[7] = q
-                glb.state[8] = r
                 
                 #%%%%%%%%%%%%%%% END OF ANGLE UPDATE LOOP %%%%%%%
 
                 ######################
                 # Implementing IMU model.
                 ######################
-                if sim == 'noise'or sim == 'ekf':
+                if sim == 'noise'or sim == 'ekf' or sim == 'neural_nets':
                 # if sim == 'noise' or 'ekf':
-                    temp_pos = pos
-                    temp_vel = vel
-                    temp_phi_theta_psi = phi_theta_psi
+                    temp_pos = qpos
+                    temp_vel = qvel
+                    temp_phi_theta_psi = qphi_theta_psi
 
                     pos[0] =   imu.pos[0]
                     pos[1] =   imu.pos[1]
@@ -252,8 +249,14 @@ def main():
                     vel[0] =   imu.uvw[0]
                     vel[1] =   imu.uvw[1]
                     vel[2] =   imu.uvw[2]
+                    p      =   imu.pqr[0]
+                    q      =   imu.pqr[1]
+                    r      =   imu.pqr[2]
 
                 #%%%%%%%%%%%%%%% END OF IMU IMPLEMENTATION %%%%%%%
+                glb.state[6] = p
+                glb.state[7] = q
+                glb.state[8] = r
                 ######################
                 # Implementing Kalman filter.
                 ######################
@@ -288,7 +291,7 @@ def main():
                         ekf_states, _ = ekf.cal_kalman_gain(dt, [], t, glb)
                         # Signal after every 3 sec
                         if t > e_intv-2:
-                            s_intv = e_intv + 5
+                            s_intv = e_intv + 1
                             e_intv = s_intv + factor
                         if sim == 'neural_nets':
                             nn_ekf_states, _ , loss_val = nn_ekf.cal_kalman_gain(dt, nn_obj, ann_input, gps_nn, np.array(gps), False, glb)
@@ -357,15 +360,15 @@ def main():
                     glb.state_ekf[6]  =  nn_ekf_states[6]
                     glb.state_ekf[7]  =  nn_ekf_states[7]
                     glb.state_ekf[8]  =  nn_ekf_states[8]
-                    pos[0] =   glb.state_ekf[0]
-                    pos[1] =   glb.state_ekf[1]
-                    pos[2] =   glb.state_ekf[2]
-                    phi    =   glb.state_ekf[6]
-                    theta  =   glb.state_ekf[7]
-                    psi    =   glb.state_ekf[8]
-                    vel[0] =   glb.state_ekf[3]
-                    vel[1] =   glb.state_ekf[4]
-                    vel[2] =   glb.state_ekf[5]
+                    # pos[0] =   glb.state_ekf[0]
+                    # pos[1] =   glb.state_ekf[1]
+                    # pos[2] =   glb.state_ekf[2]
+                    # phi    =   glb.state_ekf[6]
+                    # theta  =   glb.state_ekf[7]
+                    # psi    =   glb.state_ekf[8]
+                    # vel[0] =   glb.state_ekf[3]
+                    # vel[1] =   glb.state_ekf[4]
+                    # vel[2] =   glb.state_ekf[5]
                     # print(sid.tolist())
                     # # print('-----------')
                     # glb.p_matrix_array.insert(index, sid.tolist())
@@ -402,6 +405,7 @@ def main():
                 # print(glb.state_ekf)
                 # ---------------for Neural net
                 row = [pos[0], pos[1], pos[2], vel[0], vel[1], vel[2], phi, theta, psi, acc[0][0], acc[1][0], acc[2][0], w1, w2, w3, w4,p, q, r, t]
+                # qacc, qpos, qvel, qphi_theta_psi, qpqr = quad.quad_dynamics( w1, w2, w3, w4, phi_theta_psi, t, pos, vel, pqr, False, glb)
                 # row = [pos[0], pos[1], pos[2], vel[0], vel[1], vel[2], phi, theta, psi, w1, w2, w3, w4]
                 ann_input = np.array(row)
                 # ---------------for Neural net
@@ -409,18 +413,19 @@ def main():
                 glb.rows.insert(t, row)
                 glb.loss_val.insert(index, loss_val)
                 
-                if sim == "ekf_flag":
+                if sim == "ekf" or sim == 'neural':
                     if ekf_states.ndim > 1 :
                         ekf_states = ekf_states[0]
+                    # print(f'qpos: {qpos},state_ekf{glb.state_ekf[0:3]}')
                     pos[0] =   glb.state_ekf[0]
                     pos[1] =   glb.state_ekf[1]
                     pos[2] =   glb.state_ekf[2]
-                    phi    =   glb.state_ekf[6]
-                    theta  =   glb.state_ekf[7]
-                    psi    =   glb.state_ekf[8]
-                    vel[0] =   glb.state_ekf[3]
-                    vel[1] =   glb.state_ekf[4]
-                    vel[2] =   glb.state_ekf[5]
+                    # phi    =   glb.state_ekf[6]
+                    # theta  =   glb.state_ekf[7]
+                    # psi    =   glb.state_ekf[8]
+                    # vel[0] =   glb.state_ekf[3]
+                    # vel[1] =   glb.state_ekf[4]
+                    # vel[2] =   glb.state_ekf[5]
 
 
 
@@ -461,7 +466,7 @@ def main():
             if glb.p_matrix_array:
                 global_vars.file_write('p_matrix_array', glb.p_matrix_array)
 
-            if sim == 'no_noise':
+            if sim == 'ekf':
                 # global_vars.file_write( 'pos_array', glb.pos_array)
                 # global_vars.file_write( 'vel_array', glb.vel_array)
                 # global_vars.file_write( 'phi_theta_psi_array', glb.phi_theta_psi_array)

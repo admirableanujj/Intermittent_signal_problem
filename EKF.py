@@ -23,7 +23,7 @@ class extended_Kalman_Filter:
         self.Q = np.identity(9)*1
         self.x_hat = np.array([[0], [0], [0], [0], [0], [0], [0], [0], [0]])
         self.P = np.identity(9)
-        self.R = np.array([[50, 0, 0, 0, 0, 0, 0, 0, 0],
+        self.R = np.array([[1, 0, 0, 0, 0, 0, 0, 0, 0],
                             [0, 1, 0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 1, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 0, 0, 0],

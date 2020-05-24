@@ -52,12 +52,13 @@ class Plot_graph:
         except:
             e = sys.exc_info()
             # self.plot_acc_array(no_noise, noise, no_noise,ekf_flag)
+
             print(f'No z axis graph for you.: {e}')
         self.graph_for_position_values2(no_noise, {'ekf':ekf})
         self.graph_for_position_values2(no_noise, {'neural':neural})
-        # self.graph_for_position_values({'ekf':ekf})
+        self.graph_for_position_values({'ekf':ekf})
         # self.graph_for_pos_difference({'ekf':ekf})
-        # self.graph_for_position_values({'neural':neural})
+        self.graph_for_position_values({'neural':neural})
         # ani =  animation.sameAxisAnimation(noise, glb)        
         # plt.show()   
     
@@ -65,6 +66,7 @@ class Plot_graph:
         for key, value in data_in.items():
             data_name = key
             data = value
+            # print(f'data_name:{data_name}, data: {np.shape(value)}')
         fig3 = plt.figure()
         n = ['x','y','z']
         for i in range(0,3):
@@ -72,7 +74,7 @@ class Plot_graph:
             X_scale = np.linspace(0,(len(data.get('glb.position_final_required_array'))+1)*params.dt,len(data.get('glb.position_final_required_array'))+1)
             X_scale = X_scale[0:-1]
             line31a=ax.plot(X_scale, [x[i] for x in data.get('glb.position_final_required_array')],'r')
-            line31b=ax.plot(X_scale, [x[i] for x in true.get('glb.pos_array')], 'b')
+            line31b=ax.plot(X_scale, [x[i] for x in data.get('glb.qpos_array')], 'b')
             line31c=ax.plot(X_scale, [x[i] for x in data.get('imu.pos_array')], 'g')
             line31a[0].set_label(f'pos {n[i]} Desired')
             line31b[0].set_label(f'pos {n[i]} true')

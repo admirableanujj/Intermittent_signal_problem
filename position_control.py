@@ -33,11 +33,11 @@ class Position_Control:
         # Kd_y = 1.50
         # Kp_z = 0.155
         # Kd_z = 1.8
-        glb.Kp_x = 0.195
-        glb.Kd_x = 1.5
-        Kp_y = 0.195
-        Kd_y = 1.50
-        Kp_z = 0.155
+        glb.Kp_x = 0.3
+        glb.Kd_x = 1.0
+        Kp_y = 0.2
+        Kd_y = 0.5
+        Kp_z = 0.3
         Kd_z = 1.8
 
         
