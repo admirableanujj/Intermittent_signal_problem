@@ -1,3 +1,9 @@
+"""
+For the one who always believed in me Ankiit Saxena
+author: Anujj Saxena
+email: saxenaaj@mail.uc.edu
+Please feel free to use and modify this, but keep the above information. Thanks!
+"""
 import math
 import numpy as np 
 from  position_control import Position_Control
