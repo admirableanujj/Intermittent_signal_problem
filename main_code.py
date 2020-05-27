@@ -121,7 +121,7 @@ def main():
         # % waypoints = [-12  45 -19];
         # t_sim  = 80
         factor = 100
-        t_sim  = 20
+        t_sim  = 10
         target_waypoint = 0
 
         logging.info('Setting Parmerters')
@@ -157,6 +157,9 @@ def main():
             e_intv = 50
             glb.waypoints = waypoints
             glb.factor = factor
+            # s_wt_change = 100
+            # e_wt_change = 100
+            # orignal_m = params.m
             ###############################
             for t in range(0, t_sim*factor, int(params.dt*factor)):
                 # print(t)
@@ -205,6 +208,8 @@ def main():
 
                 # %=======================END OF POSITION CONTROL LOOP==============
                 # %%%%%% ==========  DYNAMICS OF THE QUADROTOR ==========  %%%%%%%%%
+                if t == int(t_sim*factor/2):
+                    params.m = params.m*0.8
 
                 if sim == 'noise' or sim == 'ekf' or sim =='neural':
                 # if sim == 'noise':                
@@ -264,6 +269,7 @@ def main():
                 ######################
                 if sim == 'ekf' or sim == 'neural':
                     time_intv = range(int(s_intv), int(e_intv))
+                    # time_wt_intv = range(int(s_wt_change), int(e_wt_change))
                     temp_pos, temp_vel, temp_phi_theta_psi = imu.gps_module(qpos, qvel, qphi_theta_psi)
 
                     ekf_flag = True
@@ -344,6 +350,7 @@ def main():
                     glb.state_ekf[6]  =  nn_ekf_states[6]
                     glb.state_ekf[7]  =  nn_ekf_states[7]
                     glb.state_ekf[8]  =  nn_ekf_states[8]
+
                         
 
 

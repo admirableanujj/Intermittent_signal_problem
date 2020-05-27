@@ -84,6 +84,7 @@ class Plot_graph:
             ax.set_ylabel('Distance')
             ax.legend(loc = 0)
             ax.set_title(f'{n[i]}_des vs {n[i]}')
+            ax.grid(color='k', linestyle='-', linewidth=0.5)
 
     def graph_for_position_values(self, data_in):
         for key, value in data_in.items():
@@ -108,6 +109,7 @@ class Plot_graph:
             ax.set_ylabel('Distance')
             ax.legend(loc = 0)
             ax.set_title(f'{n[i]}_des vs {n[i]}')
+            ax.grid(color='k', linestyle='-', linewidth=2)
 
     
     def graph_for_pos_difference(self, data_in):

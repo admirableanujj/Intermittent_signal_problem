@@ -265,19 +265,20 @@ class Plot_graph:
     def graph_for_angular_speed_motor(self, data, glb):
         fig4 = plt.figure()
         # print([x[0] for x in data.get('glb.w_des_array')])
+        X_scale = np.linspace(0,(len(data.get('glb.w_des_array')))*params.dt,len(data.get('glb.w_des_array')))
         ax41 = fig4.add_subplot(231)
-        line41a=ax41.plot(range(0,len(data.get('glb.w_des_array'))), [x[0] for x in data.get('glb.w_des_array')],'r')
+        line41a=ax41.plot( X_scale, [x[0] for x in data.get('glb.w_des_array')],'r')
         ax42 = fig4.add_subplot(232)
-        line42a=ax42.plot(range(0,len(data.get('glb.w_des_array'))), [y[1] for y in data.get('glb.w_des_array')],'r')
+        line42a=ax42.plot(X_scale, [y[1] for y in data.get('glb.w_des_array')],'r')
         ax43 = fig4.add_subplot(233)
-        line43a=ax43.plot(range(0,len(data.get('glb.w_des_array'))), [z[2] for z in data.get('glb.w_des_array')],'r')
+        line43a=ax43.plot(X_scale, [z[2] for z in data.get('glb.w_des_array')],'r')
         ax44 = fig4.add_subplot(234)
-        line44a=ax44.plot(range(0,len(data.get('glb.w_des_array'))), [w[3] for w in data.get('glb.w_des_array')],'r')
+        line44a=ax44.plot(X_scale, [w[3] for w in data.get('glb.w_des_array')],'r')
         # line41b=ax41.plot(range(0,len(data.get('glb.pos_array'))), [x[0] for x in data.get('glb.pos_array')], 'b')
         # line41a[0].set_label('pos x Desired')
         # line41b[0].set_label('pos x')
         # ax41.legend(loc = 1)
-        ax41.set_title('w_des vs w')
+        ax41.set_title('w_des')
         #-------------------------  
   
     # def plot_graphs3d(self, no_noise, noise, ekf, ekf_flag):
