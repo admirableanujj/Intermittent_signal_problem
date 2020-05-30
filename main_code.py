@@ -121,7 +121,8 @@ def main():
         # % waypoints = [-12  45 -19];
         # t_sim  = 80
         factor = 100
-        t_sim  = 10
+        #Set simulation time here
+        t_sim  = 70
         target_waypoint = 0
 
         logging.info('Setting Parmerters')
@@ -208,8 +209,11 @@ def main():
 
                 # %=======================END OF POSITION CONTROL LOOP==============
                 # %%%%%% ==========  DYNAMICS OF THE QUADROTOR ==========  %%%%%%%%%
+                
+                ################ Add/reduce Weight from quad  ###########
                 if t == int(t_sim*factor/2):
-                    params.m = params.m*0.8
+                    params.m = params.m*0.90
+                ################ End of Add/reduce Weight from quad  ###########
 
                 if sim == 'noise' or sim == 'ekf' or sim =='neural':
                 # if sim == 'noise':                
@@ -440,7 +444,8 @@ def main():
                 global_vars.file_write('kalman_gain_array', glb.kalman_gain_array)
             if glb.p_matrix_array:
                 global_vars.file_write('p_matrix_array', glb.p_matrix_array)
-
+            
+            ################ Following part trains Neural net ###########
             if sim == 'ekf':
                 # global_vars.file_write( 'pos_array', glb.pos_array)
                 # global_vars.file_write( 'vel_array', glb.vel_array)

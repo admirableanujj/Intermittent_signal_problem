@@ -17,7 +17,7 @@ class Plot_graph:
             no_noise = sim_data['no_noise']
             # self.graph_for_position_error( no_noise, glb)        
             # self.graph_for_attitude_related_error(no_noise, glb)
-            # self.graph_for_position_values(no_noise, glb)
+            self.graph_for_position_values(no_noise, glb)
             # self.graph_for_angular_speed_motor(no_noise, glb)
             # self.plot_loss_train('no_noise')
             # self.plot_loss_test('no_noise')
@@ -29,7 +29,7 @@ class Plot_graph:
             noise = sim_data['noise']
             # self.graph_for_position_error( noise, glb)
             # self.graph_for_attitude_related_error(noise, glb)
-            # self.graph_for_position_values(noise, glb)
+            self.graph_for_position_values(noise, glb)
             # self.graph_for_angular_speed_motor(noise, glb)
         except:
             e = sys.exc_info()
@@ -37,19 +37,19 @@ class Plot_graph:
         try:
             if ekf_flag:
                 ekf = sim_data['ekf']
-                self.graph_for_position_error( ekf, glb)
-                self.graph_for_attitude_related_error(ekf, glb)
-                self.graph_for_position_values(ekf, glb)
-                self.graph_for_angular_speed_motor(ekf, glb)
+                # self.graph_for_position_error( ekf, glb)
+                # self.graph_for_attitude_related_error(ekf, glb)
+                # self.graph_for_position_values(ekf, glb)
+                # self.graph_for_angular_speed_motor(ekf, glb)
         except:
             e = sys.exc_info()
             print(f"ekf_Error:{e}")
         try:
             neural = sim_data['neural']
-            self.graph_for_position_error(neural, glb)
-            self.graph_for_attitude_related_error(neural, glb)
-            self.graph_for_position_values(neural, glb)
-            self.graph_for_angular_speed_motor(neural, glb)
+            # self.graph_for_position_error(neural, glb)
+            # self.graph_for_attitude_related_error(neural, glb)
+            # self.graph_for_position_values(neural, glb)
+            # self.graph_for_angular_speed_motor(neural, glb)
         except:
             e = sys.exc_info()
             print(f"Nuera_nets: {e}")

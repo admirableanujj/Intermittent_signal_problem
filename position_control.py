@@ -11,6 +11,7 @@ class Position_Control:
         self.vel_final_required_array = []
         self.pos_array = []
         self.vel_array = []
+        self.integral_error_pos = [0,0,0]
         
     def position_control(self, waypoint_desired, pos, vel, k, global_vars, *args):
         
@@ -33,15 +34,17 @@ class Position_Control:
         # Kd_y = 1.50
         # Kp_z = 0.155
         # Kd_z = 1.8
-        glb.Kp_x = 0.3
+        glb.Kp_x = 0.25
         glb.Kd_x = 1.0
-        Kp_y = 0.3
+        Kp_y = 0.25
         Kd_y = 1
-        Kp_z = 0.3
+        Kp_z = 0.2
         Kd_z = 1.8
+        Ki_x = 0.001
+        Ki_y = 0.001
+        Ki_z = 0.01
 
         
-
         # % % Good gains
         # % Kp_x = 0.01;            Kd_x = 0.2;
         # % Kp_y = 0.01;            Kd_y = 0.2;
@@ -54,6 +57,7 @@ class Position_Control:
         # % Kp_z = 0.5;          Kd_z = 8;
         Kp = np.array([glb.Kp_x, Kp_y, Kp_z])
         Kd = np.array([glb.Kd_x, Kd_y, Kd_z])
+        Ki = np.array([Ki_x,Ki_y,Ki_z])
         # print('pos: ', pos, 'pos_des: ', pos_des)
         glb.error_x = pos_des[0] - pos[0]
         glb.error_y = pos_des[1] - pos[1]
@@ -78,6 +82,7 @@ class Position_Control:
         glb.error_vel_y = vel_des[1] - vel[1]
         glb.error_vel_z = vel_des[2] - vel[2]
         error_vel = [glb.error_vel_x, glb.error_vel_y, glb.error_vel_z]
+        self.integral_error_pos = self.integral_error_pos + error*params.dt
 
         ##########################################
         glb.gps[3] = error_vel[0]
@@ -88,7 +93,7 @@ class Position_Control:
         # %conmtrolling position. So there is a good chance that a PD Controller 
         # % will work.
         # % Position Control. Deciding acceleration to be given position based on position error 
-        acc_dec = acc_final_desired +  Kp*error + Kd*error_vel
+        acc_dec = acc_final_desired +  Kp*error + Kd*error_vel + Ki*self.integral_error_pos
         ######################Class Variable
         self.position_final_required_array.insert(k,np.transpose(pos_des))
         self.vel_final_required_array.insert(k, np.transpose(vel_des))

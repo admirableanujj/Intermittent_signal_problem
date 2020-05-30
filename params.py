@@ -2,7 +2,7 @@ import numpy as np
 import math
 import params
 dt= 0.01
-m = 1.08                      #% mass of the quadrotor in kg
+m = 5.08                      #% mass of the quadrotor in kg
 l = 0.12                      #% length of arm of the quadrotor in m
 g = 9.81                      #% gravity
 i = 0

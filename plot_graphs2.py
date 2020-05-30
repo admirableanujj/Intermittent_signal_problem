@@ -74,8 +74,8 @@ class Plot_graph:
             X_scale = np.linspace(0,(len(data.get('glb.position_final_required_array'))+1)*params.dt,len(data.get('glb.position_final_required_array'))+1)
             X_scale = X_scale[0:-1]
             line31a=ax.plot(X_scale, [x[i] for x in data.get('glb.position_final_required_array')],'r')
-            line31b=ax.plot(X_scale, [x[i] for x in data.get('glb.qpos_array')], 'b')
-            line31c=ax.plot(X_scale, [x[i] for x in data.get('imu.pos_array')], 'g')
+            line31b=ax.plot(X_scale, [x[i] for x in data.get('glb.qpos_array')], color='C1', linestyle='dotted')
+            line31c=ax.plot(X_scale, [x[i] for x in data.get('imu.pos_array')], 'b')
             line31a[0].set_label(f'pos {n[i]} Desired')
             line31b[0].set_label(f'pos {n[i]} true')
             line31c[0].set_label(f'pos {n[i]} {data_name}')
@@ -99,8 +99,8 @@ class Plot_graph:
             X_scale = np.linspace(0,(len(data.get('glb.position_final_required_array'))+1)*params.dt,len(data.get('glb.position_final_required_array'))+1)
             X_scale = X_scale[0:-1]
             line31a=ax.plot(X_scale, [x[i] for x in data.get('glb.position_final_required_array')],'r')
-            line31b=ax.plot(X_scale, [x[i] for x in data.get('glb.qpos_array')], 'b')
-            line31c=ax.plot(X_scale, [x[i] for x in data.get('imu.pos_array')], 'g')
+            line31b=ax.plot(X_scale, [x[i] for x in data.get('glb.qpos_array')], color='C1', linestyle='dotted')
+            line31c=ax.plot(X_scale, [x[i] for x in data.get('imu.pos_array')], 'b')
             line31a[0].set_label(f'pos {n[i]} Desired')
             line31b[0].set_label(f'pos {n[i]} true')
             line31c[0].set_label(f'pos {n[i]} {data_name}')
