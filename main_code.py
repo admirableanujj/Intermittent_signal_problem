@@ -37,10 +37,10 @@ def motor_saturation(w):
         return w
 
 def angle_saturation(angle):
-    if angle >= 0.1:
-            angle = 0.1
-    elif angle <= -0.1:
-            angle = -0.1
+    if angle >= 0.5:
+            angle = 0.5
+    elif angle <= -0.5:
+            angle = -0.5
     return angle
 
 
@@ -122,14 +122,14 @@ def main():
         # t_sim  = 80
         factor = 100
         #Set simulation time here
-        t_sim  = 70
+        t_sim  = 50
         target_waypoint = 0
 
         logging.info('Setting Parmerters')
 
         sim_data = {}
-        # ['no_noise', 'noise', 'ekf', 'neural_nets']
-        for sim in ['no_noise','noise', 'ekf','neural']:
+        # ['no_noise', 'noise', 'ekf', 'neural']
+        for sim in ['no_noise', 'noise', 'ekf', 'neural']:
             ekf = extended_Kalman_Filter()
             nn_ekf = nn_EKF()
             logging.info(f'{sim}')
@@ -211,8 +211,9 @@ def main():
                 # %%%%%% ==========  DYNAMICS OF THE QUADROTOR ==========  %%%%%%%%%
                 
                 ################ Add/reduce Weight from quad  ###########
-                if t == int(t_sim*factor/2):
-                    params.m = params.m*0.90
+                # if t == int(t_sim*factor/2):
+                # if t == 20:
+                #     params.m = params.m*0.90
                 ################ End of Add/reduce Weight from quad  ###########
 
                 if sim == 'noise' or sim == 'ekf' or sim =='neural':
@@ -359,6 +360,9 @@ def main():
 
 
                 #%%%%%%%%%%%%%%% END OF Nueral net test IMPLEMENTATION %%%%%%%
+                ################ Remove this part ###########
+
+                ################ Remove this part  ENDS here###########
                 if sim == 'ekf' or sim == 'neural':
                     glb.qpos_array.insert(index, qpos)
                 glb.w_des_array.insert(index, [w1, w2, w3, w4])

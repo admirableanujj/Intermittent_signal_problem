@@ -146,9 +146,9 @@ class Sensor:
 
     def gps_module(self, temp_pos, temp_vel, temp_phi_theta_psi):
         # print(f'temp_pos[0]:{temp_pos[0]}, gauss(0,2.0): {gauss(0,2.0)}')
-        temp_pos[0] = temp_pos[0] + gauss(0,1)
-        temp_pos[1] = temp_pos[1] + gauss(0,1)
-        temp_pos[2] = temp_pos[2] + gauss(0,1) #No measurement of z from GPS
+        temp_pos[0] = temp_pos[0] + gauss(0,1)*0.5
+        temp_pos[1] = temp_pos[1] + gauss(0,1)*0.5
+        temp_pos[2] = temp_pos[2] + gauss(0,1)*0.5 #No measurement of z from GPS
 
         return np.array(temp_pos), temp_vel, temp_phi_theta_psi
 

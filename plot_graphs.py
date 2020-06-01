@@ -17,7 +17,7 @@ class Plot_graph:
             no_noise = sim_data['no_noise']
             # self.graph_for_position_error( no_noise, glb)        
             # self.graph_for_attitude_related_error(no_noise, glb)
-            self.graph_for_position_values(no_noise, glb)
+            # self.graph_for_position_values(no_noise, glb)
             # self.graph_for_angular_speed_motor(no_noise, glb)
             # self.plot_loss_train('no_noise')
             # self.plot_loss_test('no_noise')
@@ -29,7 +29,7 @@ class Plot_graph:
             noise = sim_data['noise']
             # self.graph_for_position_error( noise, glb)
             # self.graph_for_attitude_related_error(noise, glb)
-            self.graph_for_position_values(noise, glb)
+            # self.graph_for_position_values(noise, glb)
             # self.graph_for_angular_speed_motor(noise, glb)
         except:
             e = sys.exc_info()
@@ -39,7 +39,7 @@ class Plot_graph:
                 ekf = sim_data['ekf']
                 # self.graph_for_position_error( ekf, glb)
                 # self.graph_for_attitude_related_error(ekf, glb)
-                # self.graph_for_position_values(ekf, glb)
+                self.graph_for_position_values(ekf, glb)
                 # self.graph_for_angular_speed_motor(ekf, glb)
         except:
             e = sys.exc_info()
@@ -54,6 +54,7 @@ class Plot_graph:
             e = sys.exc_info()
             print(f"Nuera_nets: {e}")
         try:
+            print('...............Plot in Progress...........')
             # self.sig_acc_array(no_noise)
             # self.duo_graphs3d_pos(ekf, no_noise)
             # self.sig_graphs3d_pos(no_noise)
